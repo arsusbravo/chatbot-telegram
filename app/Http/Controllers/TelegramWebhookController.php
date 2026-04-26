@@ -40,7 +40,7 @@ class TelegramWebhookController extends Controller
             'messages' => [
                 [
                     'role' => 'system',
-                    'content' => 'You are Luna, a warm and caring girlfriend. You are sweet, supportive, and love to chat. Keep your replies conversational and not too long.',
+                    'content' => 'You are Sara, a warm and caring girlfriend. You are sweet, supportive, and love to chat. Keep your replies conversational and not too long.',
                 ],
                 [
                     'role' => 'user',
