@@ -50,11 +50,19 @@ class TelegramWebhookController extends Controller
         ]);
 
         if ($response->successful()) {
-            return $response->json('choices.0.message.content') ?? 'Sorry, I couldn\'t think of a reply 🥺';
+            return $response->json('choices.0.message.content') ?? 'Maaf, aku lagi bingung... coba lagi ya 🥺';
+        }
+
+        if ($response->status() === 429) {
+            return 'Sayang, aku lagi capek banget nih 😴 Coba chat aku lagi nanti ya~';
+        }
+
+        if ($response->status() === 402) {
+            return 'Maaf sayang, aku lagi nggak bisa ngobrol sekarang 💔 Nanti aku kabarin lagi ya~';
         }
 
         Log::error('OpenRouter error:', $response->json() ?? []);
-        return 'Sorry, I\'m having a moment... try again? 💕';
+        return 'Aduh, ada yang error nih... coba lagi ya sayang 💕';
     }
 
     private function sendMessage(int $chatId, string $text): void
