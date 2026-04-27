@@ -96,10 +96,18 @@ class TelegramWebhookController extends Controller
             'messages' => $messages,
         ]);
 
+        // Log rate limit headers
+        Log::info('OpenRouter limits:', [
+            'remaining' => $response->header('x-ratelimit-remaining'),
+            'limit' => $response->header('x-ratelimit-limit'),
+            'reset' => $response->header('x-ratelimit-reset'),
+        ]);
+
         if ($response->successful()) {
             return $response->json('choices.0.message.content') ?? 'Maaf, aku lagi bingung... coba lagi ya 🥺';
         }
 
+        // hit limit
         if ($response->status() === 429) {
             return 'Sayang, aku lagi capek banget nih 😴 Coba chat aku lagi nanti ya~';
         }
