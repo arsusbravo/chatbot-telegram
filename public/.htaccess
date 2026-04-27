@@ -3,10 +3,6 @@
         Options -MultiViews -Indexes
     </IfModule>
 
-    <IfModule mod_pagespeed.c>
-        ModPagespeed off
-    </IfModule>
-
     RewriteEngine On
 
     # Handle Authorization Header

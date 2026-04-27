@@ -27,4 +27,10 @@ class TelegramUser extends Model
             $this->decrement('paid_credits');
         }
     }
+
+    public function lastBotUsername(): ?string
+    {
+        $lastMessage = $this->messages()->whereNotNull('bot_id')->latest()->first();
+        return $lastMessage?->bot?->telegram_username;
+    }
 }

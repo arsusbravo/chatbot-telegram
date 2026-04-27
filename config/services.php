@@ -45,4 +45,10 @@ return [
         'model' => env('AI_MODEL', 'deepseek/deepseek-v4-flash'),
     ],
 
+    'nowpayments' => [
+        'api_key' => env('NOWPAYMENTS_API_KEY'),
+        'ipn_secret' => env('NOWPAYMENTS_IPN_SECRET'),
+        'endpoint' => env('ENDPOINT_NOWPAYMENTS', 'https://api.nowpayments.io/v1'),
+    ],
+
 ];
