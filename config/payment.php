@@ -16,20 +16,20 @@ return [
 
     'packages' => [
         [
-            'name' => 'Starter',
+            'name' => 'Coba-coba',
             'credits' => 50,
             'price' => 2,
             'currency' => 'USDT',
         ],
         [
-            'name' => 'Regular',
+            'name' => 'Pacar',
             'credits' => 200,
             'price' => 5,
             'currency' => 'USDT',
             'popular' => true,
         ],
         [
-            'name' => 'Sultan',
+            'name' => 'Suami',
             'credits' => 1000,
             'price' => 15,
             'currency' => 'USDT',
