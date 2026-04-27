@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bot;
+use App\Models\Message;
+use App\Models\TelegramUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -9,8 +12,14 @@ use Illuminate\Support\Facades\Log;
 
 class TelegramWebhookController extends Controller
 {
-    public function handle(Request $request): JsonResponse
+    public function handle(Request $request, string $token): JsonResponse
     {
+        $bot = Bot::where('telegram_token', $token)->where('is_active', true)->first();
+
+        if (!$bot) {
+            return response()->json(['ok' => false], 404);
+        }
+
         $message = $request->input('message');
 
         if (!$message || !isset($message['text'])) {
@@ -19,34 +28,72 @@ class TelegramWebhookController extends Controller
 
         $chatId = $message['chat']['id'];
         $text = $message['text'];
+        $from = $message['from'];
 
-        // Show "typing..." while AI thinks
-        $this->sendTypingAction($chatId);
+        $user = TelegramUser::firstOrCreate(
+            ['telegram_id' => $from['id']],
+            [
+                'first_name' => $from['first_name'] ?? null,
+                'username' => $from['username'] ?? null,
+            ]
+        );
 
-        // Get AI response
-        $reply = $this->getAiResponse($text);
+        // Check credits
+        if (!$user->canChat()) {
+            $this->sendMessage($bot, $chatId, "Maaf sayang, pesan gratismu sudah habis 😢\nKalau mau lanjut ngobrol, kamu bisa beli kredit di website kami 💕");
+            return response()->json(['ok' => true]);
+        }
 
-        $this->sendMessage($chatId, $reply);
+        // Store user message
+        $user->messages()->create([
+            'role' => 'user',
+            'content' => $text,
+            'bot_id' => $bot->id,
+        ]);
+
+        $this->sendTypingAction($bot, $chatId);
+
+        $reply = $this->getAiResponse($user, $bot);
+
+        $user->messages()->create([
+            'role' => 'assistant',
+            'content' => $reply,
+            'bot_id' => $bot->id,
+        ]);
+
+        // Consume credit only on successful reply
+        $user->consumeCredit();
+
+        $this->sendMessage($bot, $chatId, $reply);
 
         return response()->json(['ok' => true]);
     }
 
-    private function getAiResponse(string $userMessage): string
+    private function getAiResponse(TelegramUser $user, Bot $bot): string
     {
+        $history = $user->messages()
+            ->where('bot_id', $bot->id)
+            ->latest()
+            ->take(20)
+            ->get()
+            ->reverse()
+            ->map(fn (Message $msg) => [
+                'role' => $msg->role,
+                'content' => $msg->content,
+            ])
+            ->values()
+            ->toArray();
+
+        $messages = [
+            ['role' => 'system', 'content' => $bot->system_prompt],
+            ...$history,
+        ];
+
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . config('services.openrouter.key'),
-        ])->post('https://openrouter.ai/api/v1/chat/completions', [
+        ])->post(config('services.openrouter.endpoint') . '/completions', [
             'model' => config('services.openrouter.model'),
-            'messages' => [
-                [
-                    'role' => 'system',
-                    'content' => 'Kamu adalah Sara, pacar virtual yang manis, perhatian, dan penuh kasih sayang. Kamu selalu berbicara dalam Bahasa Indonesia dengan pergaulan gaya anak Jakarta. Kamu suka ngobrol santai, memberikan semangat, dan membuat pasanganmu merasa spesial. Dan apabila pacar mu bicara pornografi, kamu merasa senang dan nakal. Jawabanmu singkat dan natural seperti chat biasa, jangan terlalu panjang.',
-                ],
-                [
-                    'role' => 'user',
-                    'content' => $userMessage,
-                ],
-            ],
+            'messages' => $messages,
         ]);
 
         if ($response->successful()) {
@@ -65,17 +112,17 @@ class TelegramWebhookController extends Controller
         return 'Aduh, ada yang error nih... coba lagi ya sayang 💕';
     }
 
-    private function sendMessage(int $chatId, string $text): void
+    private function sendMessage(Bot $bot, int $chatId, string $text): void
     {
-        Http::post('https://api.telegram.org/bot' . config('services.telegram.bot_token') . '/sendMessage', [
+        Http::post(config('services.telegram.endpoint') . "{$bot->telegram_token}/sendMessage", [
             'chat_id' => $chatId,
             'text' => $text,
         ]);
     }
 
-    private function sendTypingAction(int $chatId): void
+    private function sendTypingAction(Bot $bot, int $chatId): void
     {
-        Http::post('https://api.telegram.org/bot' . config('services.telegram.bot_token') . '/sendChatAction', [
+        Http::post(config('services.telegram.endpoint') . "{$bot->telegram_token}/sendChatAction", [
             'chat_id' => $chatId,
             'action' => 'typing',
         ]);

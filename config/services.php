@@ -36,12 +36,13 @@ return [
     ],
 
     'telegram' => [
-        'bot_token' => env('KEY_TELEGRAM_BOT'),
+        'endpoint' => env('ENDPOINT_TELEGRAM', 'https://api.telegram.org/bot'),
     ],
 
     'openrouter' => [
+        'endpoint' => env('ENDPOINT_OPENROUTER', 'https://openrouter.ai/api/v1/chat'),
         'key' => env('KEY_OPENROUTER'),
-        'model' => 'deepseek/deepseek-v4-flash',
+        'model' => env('AI_MODEL', 'deepseek/deepseek-v4-flash'),
     ],
 
 ];
