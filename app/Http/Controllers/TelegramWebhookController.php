@@ -40,7 +40,7 @@ class TelegramWebhookController extends Controller
 
         // Check credits
         if (!$user->canChat()) {
-            $this->sendMessage($bot, $chatId, "Maaf sayang, pesan gratismu sudah habis 😢\nKalau mau lanjut ngobrol, kamu bisa beli kredit di website kami 💕");
+            $this->sendMessage($bot, $chatId, "Maaf sayang, pesan gratismu sudah habis 😢\nBapak ku marah-marah. Katanya kalau mau lanjut ngobrol, kamu bisa beli kredit di website kami 💕");
             return response()->json(['ok' => true]);
         }
 

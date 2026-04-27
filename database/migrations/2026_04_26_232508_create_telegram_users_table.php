@@ -16,7 +16,7 @@ return new class extends Migration
             $table->bigInteger('telegram_id')->unique();
             $table->string('first_name')->nullable();
             $table->string('username')->nullable();
-            $table->integer('free_messages_left')->default(20);
+            $table->integer('free_messages_left')->default(10);
             $table->integer('paid_credits')->default(0);
             $table->timestamps();
         });
