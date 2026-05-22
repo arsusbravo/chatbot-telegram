@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 
 class ImageGenerationService
 {
-    private string $imagePrompt = 'Core Constraint: High-fidelity facial reconstruction of the input figure [image_0.png], preserving facial features and structure.
+    private string $imagePrompt = 'Core Constraint: High-fidelity facial reconstruction of the input figure, preserving facial features and structure.
 
 Composition: Extreme close-up portrait (framing the face and upper shoulders), direct eye-contact with the lens, intimate angle, slightly tilted head, wearing tight top.
 
