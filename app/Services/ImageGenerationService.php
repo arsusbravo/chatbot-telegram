@@ -7,14 +7,17 @@ use Illuminate\Support\Facades\Log;
 
 class ImageGenerationService
 {
-    private string $imagePrompt = "mirror selfie, phone held low at hip level, body fully visible head to mid-thigh,
+    private string $imagePrompt = "mirror selfie, upper body shot framed from chest to head,
+low-cut v-neck crop top, visible décolletage, cleavage showing,
+leaning slightly forward toward mirror,
 3/4 angle, back slightly arched, one hand on hip,
 flirtatious smile, direct eye contact,
 tight low-cut crop top, high waisted jeans,
 bedroom mirror, warm dim lighting, fairy lights,
 photorealistic, 8k";
 
-    private string $imageNegativePrompt = "phone covering face, hand holding phone, arm blocking body,
+    private string $imageNegativePrompt = "full body, legs visible, feet visible, turtleneck, high neckline,
+phone covering chest, arm blocking body, hijab, baggy clothes,
 gray background, studio lighting, cartoon, anime,
 deformed, bad anatomy, watermark, low quality";
 
