@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 
 class ImageGenerationService
 {
-    private string $imagePrompt = "Indonesian woman taking a selfie, one arm raised holding camera slightly above eye level, body turned at a 3/4 angle, not facing straight, leaning slightly forward, tilted head, soft flirtatious smile with eye contact, big expressive brown eyes, long straight black hair falling naturally, warm golden-tan skin, low-cut top, curvy voluptuous figure, large bust visible, cozy bedroom interior background, warm soft lighting, bedside lamp light, shallow depth of field, bokeh background, selfie perspective, portrait orientation, photorealistic, 8k, natural makeup";
+    private string $imagePrompt = "close-up portrait of a beautiful Indonesian woman, shot from slightly above at a downward angle, direct eye contact, slight wide-angle lens distortion, face and upper body framed, body turned at a 3/4 angle leaning slightly forward, tilted head, soft flirtatious smile, big expressive brown eyes, long straight black hair falling naturally, warm golden tan skin, olive green ribbed tank top, curvy voluptuous hourglass figure, large full bust, cozy bedroom interior, warm soft lighting, bokeh background, photorealistic, 8k, natural makeup";
 
     private string $imageNegativePrompt = "both arms visible, straight-on pose, studio background, outdoor, sunlight, blurry face, deformed hands, extra fingers, bad anatomy, watermark, logo, text, low quality, cartoon, anime, ugly, stiff pose, formal clothing, busy background, multiple people, no eye contact, sad expression, closed eyes, short hair, light skin, masculine features";
 
