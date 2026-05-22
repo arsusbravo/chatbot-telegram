@@ -8,6 +8,8 @@ export interface Bot {
     telegram_token: string;
     telegram_username: string;
     system_prompt: string;
+    image_prompt: string | null;
+    negative_prompt: string | null;
     is_active: boolean;
     avatar_url?: string | null;
     messages_count?: number;

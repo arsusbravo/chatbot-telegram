@@ -28,10 +28,12 @@ class BotController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'telegram_token' => 'required|string|unique:bots,telegram_token',
+            'name'              => 'required|string|max:255',
+            'telegram_token'    => 'required|string|unique:bots,telegram_token',
             'telegram_username' => 'required|string|unique:bots,telegram_username',
-            'system_prompt' => 'required|string',
+            'system_prompt'     => 'required|string',
+            'image_prompt'      => 'nullable|string',
+            'negative_prompt'   => 'nullable|string',
         ]);
 
         $bot = Bot::create($validated);
@@ -52,11 +54,13 @@ class BotController extends Controller
     public function update(Request $request, Bot $bot): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'telegram_token' => 'required|string|unique:bots,telegram_token,' . $bot->id,
+            'name'              => 'required|string|max:255',
+            'telegram_token'    => 'required|string|unique:bots,telegram_token,' . $bot->id,
             'telegram_username' => 'required|string|unique:bots,telegram_username,' . $bot->id,
-            'system_prompt' => 'required|string',
-            'is_active' => 'boolean',
+            'system_prompt'     => 'required|string',
+            'image_prompt'      => 'nullable|string',
+            'negative_prompt'   => 'nullable|string',
+            'is_active'         => 'boolean',
         ]);
 
         $bot->update($validated);

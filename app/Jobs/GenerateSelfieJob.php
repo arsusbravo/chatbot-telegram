@@ -32,7 +32,7 @@ class GenerateSelfieJob implements ShouldQueue
         $token    = $this->bot->telegram_token;
 
         try {
-            $imageUrl = $service->generateSelfie($this->bot->avatar_url);
+            $imageUrl = $service->generateSelfie($this->bot->avatar_url, $this->bot->image_prompt, $this->bot->negative_prompt);
 
             if ($imageUrl) {
                 $this->user->messages()->create(['role' => 'user',      'content' => $this->userText,   'bot_id' => $this->bot->id]);

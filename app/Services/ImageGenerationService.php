@@ -21,15 +21,15 @@ phone covering chest, arm blocking body,
 gray background, studio lighting, cartoon, anime,
 deformed, bad anatomy, watermark, low quality";
 
-    public function generateSelfie(string $referenceImageUrl): ?string
+    public function generateSelfie(string $referenceImageUrl, ?string $imagePrompt = null, ?string $negativePrompt = null): ?string
     {
         $model = config('services.fal.model');
 
         $response = Http::withHeaders([
             'Authorization' => 'Key ' . config('services.fal.key'),
         ])->timeout(180)->post("https://fal.run/{$model}", [
-            'prompt'              => $this->imagePrompt,
-            'negative_prompt'     => $this->imageNegativePrompt,
+            'prompt'              => $imagePrompt ?: $this->imagePrompt,
+            'negative_prompt'     => $negativePrompt ?: $this->imageNegativePrompt,
             'reference_images'    => [['image_url' => $referenceImageUrl]],
             'id_scale'            => 0.8,
             'guidance_scale'      => 1.5,  // max is 1.5
