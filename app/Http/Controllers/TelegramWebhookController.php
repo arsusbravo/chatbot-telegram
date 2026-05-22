@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\GenerateSelfieJob;
 use App\Models\Bot;
 use App\Models\Message;
 use App\Models\TelegramUser;
-use App\Services\ImageGenerationService;
 use App\Services\NowPaymentsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -59,20 +59,17 @@ class TelegramWebhookController extends Controller
                 return response()->json(['ok' => true]);
             }
 
-            $this->sendMessage($bot, $chatId, 'Bentar ya sayang, lagi dandan dulu buat foto 📸✨');
+            $waitingMessages = [
+                'Bentar ya sayang, lagi dandan dulu 📸✨',
+                'Sebentar, lagi milih pose yang paling cute 🤳💕',
+                'Oke oke, tunggu bentar ya, lagi set up lighting dulu 🌟',
+                'Ehehe bentar, lagi touch up makeup dulu 💄😘',
+                'Sabar ya sayangku, lagi cari angle terbaik 📷💖',
+            ];
+            $this->sendMessage($bot, $chatId, $waitingMessages[array_rand($waitingMessages)]);
             $this->sendChatAction($bot, $chatId, 'upload_photo');
 
-            $imageUrl = app(ImageGenerationService::class)->generateSelfie($bot->avatar_url);
-
-            if ($imageUrl) {
-                $user->messages()->create(['role' => 'user',      'content' => $text,           'bot_id' => $bot->id]);
-                $user->messages()->create(['role' => 'assistant', 'content' => '[selfie photo]', 'bot_id' => $bot->id]);
-                $user->consumeCredit(5);
-                $this->sendPhoto($bot, $chatId, $imageUrl);
-            } else {
-                $this->sendMessage($bot, $chatId,
-                    'Aduh maaf sayang, fotonya gagal nih 😢 Coba lagi ya~');
-            }
+            GenerateSelfieJob::dispatch($bot, $user, $chatId, $text);
 
             return response()->json(['ok' => true]);
         }

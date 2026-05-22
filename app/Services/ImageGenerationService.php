@@ -7,15 +7,7 @@ use Illuminate\Support\Facades\Log;
 
 class ImageGenerationService
 {
-    private string $imagePrompt = 'Core Constraint: High-fidelity facial reconstruction of the input figure, preserving facial features and structure.
-
-Composition: Extreme close-up portrait (framing the face and upper shoulders), direct eye-contact with the lens, intimate angle, slightly tilted head, wearing tight top.
-
-Expression & Mood: A magnetic, deeply confident expression; a knowing, alluring gaze; a subtle, inviting smile; a soft but impactful presence.
-
-Lighting & Aesthetic: Soft, warm, intimate studio lighting (e.g., cinematic rim lighting), diffused background with bokeh, sharp focus on the eyes, natural skin texture, clean finish.
-
-Exclusions: At least one hand not visible, no phone or camera in frame, no accessories obscuring the face.';
+    private string $imagePrompt = 'Core Subject: A single half-body shot of the woman, Composition: casual smartphone selfie perspective, dynamic casual pose, off-center framing, looking over shoulder into the lens, eye-contact, Aesthetics & Vibe: highly inviting and confident expression, alluring gaze, subtle smirk, natural relaxed posture, Setting & Lighting: atmospheric depth, soft realistic shadows, high-quality rendering, Exclusions: no grids, no split screens, no multiple angles, no phone visible in hand.';
 
     public function generateSelfie(string $referenceImageUrl): ?string
     {
