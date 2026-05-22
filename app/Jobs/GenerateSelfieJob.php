@@ -44,7 +44,7 @@ class GenerateSelfieJob implements ShouldQueue
         } else {
             Http::post("{$endpoint}{$token}/sendMessage", [
                 'chat_id' => $this->chatId,
-                'text'    => 'Aduh maaf sayang, fotonya gagal nih 😢 Coba lagi ya~',
+                'text'    => __('messages.selfie_failed'),
             ]);
         }
     }

@@ -54,18 +54,11 @@ class TelegramWebhookController extends Controller
         // Selfie request handling
         if ($this->isSelfieRequest($text) && $bot->avatar_url) {
             if (!$user->canChat(5)) {
-                $this->sendPackageOptions($bot, $chatId,
-                    "Mau selfie? Kreditnya habis dulu nih sayang 😢\n");
+                $this->sendPackageOptions($bot, $chatId, __('messages.selfie_no_credits'));
                 return response()->json(['ok' => true]);
             }
 
-            $waitingMessages = [
-                'Bentar ya sayang, lagi dandan dulu 📸✨',
-                'Sebentar, lagi milih pose yang paling cute 🤳💕',
-                'Oke oke, tunggu bentar ya, lagi set up lighting dulu 🌟',
-                'Ehehe bentar, lagi touch up makeup dulu 💄😘',
-                'Sabar ya sayangku, lagi cari angle terbaik 📷💖',
-            ];
+            $waitingMessages = __('messages.selfie_waiting');
             $this->sendMessage($bot, $chatId, $waitingMessages[array_rand($waitingMessages)]);
             $this->sendChatAction($bot, $chatId, 'upload_photo');
 
@@ -75,14 +68,14 @@ class TelegramWebhookController extends Controller
         }
 
         if (!$user->canChat()) {
-            $this->sendPackageOptions($bot, $chatId, "Maaf sayang, aku ga bisa terus chat lagi 😢. Bapak ku marah-marah.\nKatanya kalau mau lanjut ngobrol suruh pilih paket buat lanjut 💕\n");
+            $this->sendPackageOptions($bot, $chatId, __('messages.chat_no_credits'));
             return response()->json(['ok' => true]);
         }
 
         $user->messages()->create([
-            'role'   => 'user',
+            'role'    => 'user',
             'content' => $text,
-            'bot_id' => $bot->id,
+            'bot_id'  => $bot->id,
         ]);
 
         $this->sendChatAction($bot, $chatId, 'typing');
@@ -90,9 +83,9 @@ class TelegramWebhookController extends Controller
         $reply = $this->getAiResponse($user, $bot);
 
         $user->messages()->create([
-            'role'   => 'assistant',
+            'role'    => 'assistant',
             'content' => $reply,
-            'bot_id' => $bot->id,
+            'bot_id'  => $bot->id,
         ]);
 
         $user->consumeCredit();
@@ -104,13 +97,9 @@ class TelegramWebhookController extends Controller
 
     private function isSelfieRequest(string $text): bool
     {
-        $keywords = [
-            'minta selfie', 'minta foto', 'minta photo', 'kirim photo', 'kirim foto',
-            'send photo', 'tunjukkan foto', 'tunjukkin foto', 'lihat foto', 'minta fotonya',
-            'kirim fotonya', 'mau fotonya', 'mau photonya', 'potret mu', 'fotomu', 'photomu',
-        ];
+        $keywords = __('messages.selfie_keywords');
+        $lower    = mb_strtolower($text);
 
-        $lower = mb_strtolower($text);
         foreach ($keywords as $keyword) {
             if (str_contains($lower, $keyword)) {
                 return true;
@@ -123,7 +112,7 @@ class TelegramWebhookController extends Controller
     private function sendPackageOptions(Bot $bot, int $chatId, string $prefix = ''): void
     {
         $packages = config('payment.packages');
-        $text     = $prefix . "💎 Pilih paket kredit chat:\n";
+        $text     = $prefix . __('messages.package_header');
 
         $buttons = [];
         foreach ($packages as $i => $pkg) {
@@ -149,7 +138,7 @@ class TelegramWebhookController extends Controller
 
         Http::post(config('services.telegram.endpoint') . "{$bot->telegram_token}/answerCallbackQuery", [
             'callback_query_id' => $callbackId,
-            'text'              => 'Sedang buat link pembayaran...',
+            'text'              => __('messages.payment_creating'),
         ]);
 
         if (!str_starts_with($data, 'buy:')) {
@@ -178,11 +167,13 @@ class TelegramWebhookController extends Controller
 
         if ($invoice) {
             $pkg  = $packages[$packageIndex];
-            $text = "✅ Paket {$pkg['name']} ({$pkg['credits']} kredit)\n\n";
-            $text .= "💳 Bayar di sini sayang:\n{$invoice['invoice_url']}\n\n";
-            $text .= "Setelah bayar, kreditmu otomatis ditambahkan ya~ 💕";
+            $text = __('messages.payment_success', [
+                'name'    => $pkg['name'],
+                'credits' => $pkg['credits'],
+                'url'     => $invoice['invoice_url'],
+            ]);
         } else {
-            $text = "⚠️ Maaf, pembayaran lagi gangguan. Coba lagi nanti ya sayang~";
+            $text = __('messages.payment_error');
         }
 
         $this->sendMessage($bot, $chatId, $text);
@@ -216,19 +207,19 @@ class TelegramWebhookController extends Controller
         ]);
 
         if ($response->successful()) {
-            return $response->json('choices.0.message.content') ?? 'Maaf, aku lagi bingung... coba lagi ya 🥺';
+            return $response->json('choices.0.message.content') ?? __('messages.ai_confused');
         }
 
         if ($response->status() === 429) {
-            return 'Sayang, aku lagi capek banget nih 😴 Coba chat aku lagi nanti ya~';
+            return __('messages.ai_tired');
         }
 
         if ($response->status() === 402) {
-            return 'Maaf sayang, aku lagi nggak bisa ngobrol sekarang 💔 Nanti aku kabarin lagi ya~';
+            return __('messages.ai_unavailable');
         }
 
         Log::error('OpenRouter error:', $response->json() ?? []);
-        return 'Aduh, ada yang error nih... coba lagi ya sayang 💕';
+        return __('messages.ai_error');
     }
 
     private function sendMessage(Bot $bot, int $chatId, string $text): void
