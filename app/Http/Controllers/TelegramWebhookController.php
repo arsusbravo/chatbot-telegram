@@ -59,6 +59,7 @@ class TelegramWebhookController extends Controller
                 return response()->json(['ok' => true]);
             }
 
+            $this->sendMessage($bot, $chatId, 'Bentar ya sayang, lagi dandan dulu buat foto 📸✨');
             $this->sendChatAction($bot, $chatId, 'upload_photo');
 
             $imageUrl = app(ImageGenerationService::class)->generateSelfie($bot->avatar_url);
