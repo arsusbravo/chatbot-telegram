@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 class GenerateSelfieJob implements ShouldQueue
@@ -30,22 +31,26 @@ class GenerateSelfieJob implements ShouldQueue
         $endpoint = config('services.telegram.endpoint');
         $token    = $this->bot->telegram_token;
 
-        $imageUrl = $service->generateSelfie($this->bot->avatar_url);
+        try {
+            $imageUrl = $service->generateSelfie($this->bot->avatar_url);
 
-        if ($imageUrl) {
-            $this->user->messages()->create(['role' => 'user',      'content' => $this->userText,   'bot_id' => $this->bot->id]);
-            $this->user->messages()->create(['role' => 'assistant', 'content' => '[selfie photo]',  'bot_id' => $this->bot->id]);
-            $this->user->consumeCredit(5);
+            if ($imageUrl) {
+                $this->user->messages()->create(['role' => 'user',      'content' => $this->userText,   'bot_id' => $this->bot->id]);
+                $this->user->messages()->create(['role' => 'assistant', 'content' => '[selfie photo]',  'bot_id' => $this->bot->id]);
+                $this->user->consumeCredit(5);
 
-            Http::post("{$endpoint}{$token}/sendPhoto", [
-                'chat_id' => $this->chatId,
-                'photo'   => $imageUrl,
-            ]);
-        } else {
-            Http::post("{$endpoint}{$token}/sendMessage", [
-                'chat_id' => $this->chatId,
-                'text'    => __('messages.selfie_failed'),
-            ]);
+                Http::post("{$endpoint}{$token}/sendPhoto", [
+                    'chat_id' => $this->chatId,
+                    'photo'   => $imageUrl,
+                ]);
+            } else {
+                Http::post("{$endpoint}{$token}/sendMessage", [
+                    'chat_id' => $this->chatId,
+                    'text'    => __('messages.selfie_failed'),
+                ]);
+            }
+        } finally {
+            Cache::forget("selfie_pending_{$this->user->telegram_id}");
         }
     }
 }

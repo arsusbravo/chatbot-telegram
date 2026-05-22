@@ -11,7 +11,8 @@ return [
         'Ehehe bentar, lagi touch up makeup dulu 💄😘',
         'Sabar ya sayangku, lagi cari angle terbaik 📷💖',
     ],
-    'selfie_failed' => 'Aduh maaf sayang, fotonya gagal nih 😢 Coba lagi ya~',
+    'selfie_failed'           => 'Aduh maaf sayang, fotonya gagal nih 😢 Coba lagi ya~',
+    'selfie_already_pending'  => 'Sabar ya sayang, fotonya lagi diproses nih 📸 Bentar lagi selesai~',
 
     // Chat
     'chat_no_credits' => "Maaf sayang, aku ga bisa terus chat lagi 😢. Bapak ku marah-marah.\nKatanya kalau mau lanjut ngobrol suruh pilih paket buat lanjut 💕\n",
@@ -31,6 +32,7 @@ return [
         'tunjukin selfie', 'tunjukin foto', 'tunjukin photo', 'tunjukin potret',
         'lihat selfie', 'lihat foto', 'lihat photo', 'lihat potret',
         'mau selfie', 'mau foto', 'mau photo', 'mau potret',
+        'mana selfie', 'mana foto', 'mana photo', 'mana potret',
     ],
 
     // AI errors

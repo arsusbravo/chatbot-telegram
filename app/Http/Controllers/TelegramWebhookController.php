@@ -9,6 +9,7 @@ use App\Models\TelegramUser;
 use App\Services\NowPaymentsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -57,6 +58,15 @@ class TelegramWebhookController extends Controller
                 $this->sendPackageOptions($bot, $chatId, __('messages.selfie_no_credits'));
                 return response()->json(['ok' => true]);
             }
+
+            $lockKey = "selfie_pending_{$user->telegram_id}";
+
+            if (Cache::has($lockKey)) {
+                $this->sendMessage($bot, $chatId, __('messages.selfie_already_pending'));
+                return response()->json(['ok' => true]);
+            }
+
+            Cache::put($lockKey, true, now()->addMinutes(5));
 
             $waitingMessages = __('messages.selfie_waiting');
             $this->sendMessage($bot, $chatId, $waitingMessages[array_rand($waitingMessages)]);
