@@ -17,7 +17,7 @@ bedroom mirror, warm dim lighting, fairy lights,
 photorealistic, 8k";
 
     private string $imageNegativePrompt = "full body, legs visible, feet visible, turtleneck, high neckline,
-phone covering chest, arm blocking body, hijab, baggy clothes,
+phone covering chest, arm blocking body,
 gray background, studio lighting, cartoon, anime,
 deformed, bad anatomy, watermark, low quality";
 
