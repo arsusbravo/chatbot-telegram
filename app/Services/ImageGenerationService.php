@@ -22,8 +22,8 @@ class ImageGenerationService
             'negative_prompt'     => $this->imageNegativePrompt,
             'reference_images'    => [['image_url' => $referenceImageUrl]],
             'id_scale'            => 0.8,
-            'guidance_scale'      => 7.5,
-            'num_inference_steps' => 28,
+            'guidance_scale'      => 1.5,  // max is 1.5
+            'num_inference_steps' => 12,   // max is 12
             'image_size'          => 'portrait_4_3',
             'num_images'          => 1,
         ]);
