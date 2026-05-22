@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Message;
 use App\Models\TelegramUser;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,10 +23,6 @@ class TelegramUserController extends Controller
     {
         return Inertia::render('telegram-users/Show', [
             'telegramUser' => $telegramUser,
-            'messages' => $telegramUser->messages()
-                ->with('bot')
-                ->latest()
-                ->paginate(50),
         ]);
     }
 

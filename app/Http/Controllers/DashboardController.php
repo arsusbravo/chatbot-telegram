@@ -21,10 +21,6 @@ class DashboardController extends Controller
                 'total_messages' => Message::count(),
                 'messages_today' => Message::whereDate('created_at', Carbon::today())->count(),
             ],
-            'recentMessages' => Message::with(['telegramUser', 'bot'])
-                ->latest()
-                ->take(10)
-                ->get(),
         ]);
     }
 }
