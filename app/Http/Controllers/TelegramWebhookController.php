@@ -105,9 +105,9 @@ class TelegramWebhookController extends Controller
     private function isSelfieRequest(string $text): bool
     {
         $keywords = [
-            'selfie', 'foto', 'photo', 'gambar', 'kirim foto', 'send pic',
-            'send photo', 'tunjukkan', 'tunjukkin', 'lihat foto', 'minta foto',
-            'kirim gambar', 'fotonya', 'photonya', 'pic', 'picture', 'potret',
+            'minta selfie', 'minta foto', 'minta photo', 'kirim photo', 'kirim foto',
+            'send photo', 'tunjukkan foto', 'tunjukkin foto', 'lihat foto', 'minta fotonya',
+            'kirim fotonya', 'mau fotonya', 'mau photonya', 'potret mu', 'fotomu', 'photomu',
         ];
 
         $lower = mb_strtolower($text);
