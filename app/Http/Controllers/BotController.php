@@ -108,7 +108,6 @@ class BotController extends Controller
                 return;
             }
 
-            // Pick largest size (last item in sizes array)
             $sizes   = $photos[0];
             $largest = end($sizes);
             $fileId  = $largest['file_id'];
@@ -131,7 +130,7 @@ class BotController extends Controller
             $storagePath = "avatars/bot_{$bot->id}.jpg";
             Storage::disk('public')->put($storagePath, $imageContents);
 
-            $bot->update(['avatar_url' => Storage::disk('public')->url($storagePath)]);
+            $bot->update(['avatar_url' => asset('storage/' . $storagePath) . '?v=' . time()]);
         } catch (\Throwable $e) {
             Log::warning("Failed to fetch avatar for bot {$bot->id}: " . $e->getMessage());
         }

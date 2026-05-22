@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\GenerateReplyJob;
 use App\Jobs\GenerateSelfieJob;
 use App\Models\Bot;
+use App\Models\Message;
 use App\Models\TelegramUser;
 use App\Services\NowPaymentsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class TelegramWebhookController extends Controller
 {
@@ -71,9 +72,25 @@ class TelegramWebhookController extends Controller
             return response()->json(['ok' => true]);
         }
 
+        $user->messages()->create([
+            'role'    => 'user',
+            'content' => $text,
+            'bot_id'  => $bot->id,
+        ]);
+
         $this->sendChatAction($bot, $chatId, 'typing');
 
-        GenerateReplyJob::dispatch($bot, $user, $chatId, $text);
+        $reply = $this->getAiResponse($user, $bot);
+
+        $user->messages()->create([
+            'role'    => 'assistant',
+            'content' => $reply,
+            'bot_id'  => $bot->id,
+        ]);
+
+        $user->consumeCredit();
+
+        $this->sendMessage($bot, $chatId, $reply);
 
         return response()->json(['ok' => true]);
     }
@@ -163,6 +180,49 @@ class TelegramWebhookController extends Controller
         }
 
         $this->sendMessage($bot, $chatId, $text);
+    }
+
+    private function getAiResponse(TelegramUser $user, Bot $bot): string
+    {
+        $history = $user->messages()
+            ->where('bot_id', $bot->id)
+            ->latest()
+            ->take(20)
+            ->get()
+            ->reverse()
+            ->map(fn (Message $msg) => [
+                'role'    => $msg->role,
+                'content' => $msg->content,
+            ])
+            ->values()
+            ->toArray();
+
+        $messages = [
+            ['role' => 'system', 'content' => $bot->system_prompt],
+            ...$history,
+        ];
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . config('services.openrouter.key'),
+        ])->timeout(90)->post(config('services.openrouter.endpoint') . '/completions', [
+            'model'    => config('services.openrouter.model'),
+            'messages' => $messages,
+        ]);
+
+        if ($response->successful()) {
+            return $response->json('choices.0.message.content') ?? __('messages.ai_confused');
+        }
+
+        if ($response->status() === 429) {
+            return __('messages.ai_tired');
+        }
+
+        if ($response->status() === 402) {
+            return __('messages.ai_unavailable');
+        }
+
+        Log::error('OpenRouter error:', $response->json() ?? []);
+        return __('messages.ai_error');
     }
 
     private function sendMessage(Bot $bot, int $chatId, string $text): void
