@@ -7,9 +7,16 @@ use Illuminate\Support\Facades\Log;
 
 class ImageGenerationService
 {
-    private string $imagePrompt = "close-up portrait of a beautiful Indonesian woman, shot from slightly above at a downward angle, direct eye contact, slight wide-angle lens distortion, face and upper body framed, body turned at a 3/4 angle leaning slightly forward, tilted head, soft flirtatious smile, big expressive brown eyes, long straight black hair falling naturally, warm golden tan skin, olive green ribbed tank top, curvy voluptuous hourglass figure, large full bust, cozy bedroom interior, warm soft lighting, bokeh background, photorealistic, 8k, natural makeup";
+    private string $imagePrompt = "mirror selfie, phone held low at hip level, body fully visible head to mid-thigh,
+3/4 angle, back slightly arched, one hand on hip,
+flirtatious smile, direct eye contact,
+tight low-cut crop top, high waisted jeans,
+bedroom mirror, warm dim lighting, fairy lights,
+photorealistic, 8k";
 
-    private string $imageNegativePrompt = "both arms visible, straight-on pose, studio background, outdoor, sunlight, blurry face, deformed hands, extra fingers, bad anatomy, watermark, logo, text, low quality, cartoon, anime, ugly, stiff pose, formal clothing, busy background, multiple people, no eye contact, sad expression, closed eyes, short hair, light skin, masculine features";
+    private string $imageNegativePrompt = "phone covering face, hand holding phone, arm blocking body,
+gray background, studio lighting, cartoon, anime,
+deformed, bad anatomy, watermark, low quality";
 
     public function generateSelfie(string $referenceImageUrl): ?string
     {

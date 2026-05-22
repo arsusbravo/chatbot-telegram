@@ -27,6 +27,7 @@ return [
     'selfie_keywords' => [
         'minta selfie', 'minta foto', 'minta photo', 'minta potret',
         'kirim selfie', 'kirim foto', 'kirim photo', 'kirim potret',
+        'kasih selfie', 'kasih foto', 'kasih photo', 'kasih potret',
         'tunjukkan selfie', 'tunjukkan foto', 'tunjukkan photo', 'tunjukkan potret',
         'tunjukkin selfie', 'tunjukkin foto', 'tunjukkin photo', 'tunjukkin potret',
         'tunjukin selfie', 'tunjukin foto', 'tunjukin photo', 'tunjukin potret',
