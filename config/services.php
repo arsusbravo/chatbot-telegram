@@ -45,6 +45,10 @@ return [
         'model' => env('AI_MODEL', 'deepseek/deepseek-v4-flash'),
     ],
 
+    'fal' => [
+        'key' => env('FAL_API_KEY'),
+    ],
+
     'nowpayments' => [
         'api_key' => env('NOWPAYMENTS_API_KEY'),
         'ipn_secret' => env('NOWPAYMENTS_IPN_SECRET'),

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Bot extends Model
 {
-    protected $fillable = ['name', 'telegram_token', 'telegram_username', 'system_prompt', 'is_active'];
+    protected $fillable = ['name', 'telegram_token', 'telegram_username', 'system_prompt', 'is_active', 'avatar_url'];
 
     public function messages(): HasMany
     {

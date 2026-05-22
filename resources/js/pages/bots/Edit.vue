@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Head, useForm } from '@inertiajs/vue3';
-import { index, update } from '@/routes/bots';
+import { Head, Link, useForm } from '@inertiajs/vue3';
+import { index, update, syncAvatar } from '@/routes/bots';
 import type { Bot } from '@/types';
 
 const props = defineProps<{
@@ -85,6 +85,39 @@ function submit() {
                     class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <label for="is_active" class="text-sm text-gray-700 dark:text-gray-300">Active</label>
+            </div>
+
+            <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4 space-y-3">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Selfie Avatar (from Telegram profile photo)
+                </label>
+                <div class="flex items-center gap-4">
+                    <img
+                        v-if="bot.avatar_url"
+                        :src="bot.avatar_url"
+                        class="h-16 w-16 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
+                        alt="Bot avatar"
+                    />
+                    <div
+                        v-else
+                        class="h-16 w-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400 text-xs text-center leading-tight p-1"
+                    >
+                        No avatar
+                    </div>
+                    <div class="space-y-1">
+                        <Link
+                            :href="syncAvatar(bot.id).url"
+                            method="post"
+                            as="button"
+                            class="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-sm rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition text-gray-700 dark:text-gray-300"
+                        >
+                            Sync from Telegram
+                        </Link>
+                        <p class="text-xs text-gray-400">
+                            Set the bot's profile photo in BotFather, then click Sync.
+                        </p>
+                    </div>
+                </div>
             </div>
 
             <button

@@ -9,6 +9,7 @@ export interface Bot {
     telegram_username: string;
     system_prompt: string;
     is_active: boolean;
+    avatar_url?: string | null;
     messages_count?: number;
     created_at: string;
     updated_at: string;

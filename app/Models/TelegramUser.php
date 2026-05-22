@@ -14,17 +14,21 @@ class TelegramUser extends Model
         return $this->hasMany(Message::class);
     }
 
-    public function canChat(): bool
+    public function canChat(int $cost = 1): bool
     {
-        return $this->free_messages_left > 0 || $this->paid_credits > 0;
+        return ($this->free_messages_left + $this->paid_credits) >= $cost;
     }
 
-    public function consumeCredit(): void
+    public function consumeCredit(int $cost = 1): void
     {
-        if ($this->free_messages_left > 0) {
-            $this->decrement('free_messages_left');
-        } else {
-            $this->decrement('paid_credits');
+        $fromFree = min($this->free_messages_left, $cost);
+        $fromPaid = $cost - $fromFree;
+
+        if ($fromFree > 0) {
+            $this->decrement('free_messages_left', $fromFree);
+        }
+        if ($fromPaid > 0) {
+            $this->decrement('paid_credits', $fromPaid);
         }
     }
 

@@ -6,6 +6,8 @@ use App\Models\Bot;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -34,8 +36,8 @@ class BotController extends Controller
 
         $bot = Bot::create($validated);
 
-        // Auto-register webhook
         $this->registerWebhook($bot);
+        $this->fetchAndStoreAvatar($bot);
 
         return redirect()->route('bots.index');
     }
@@ -59,9 +61,9 @@ class BotController extends Controller
 
         $bot->update($validated);
 
-        // Re-register webhook if token changed
         if ($bot->wasChanged('telegram_token')) {
             $this->registerWebhook($bot);
+            $this->fetchAndStoreAvatar($bot);
         }
 
         return redirect()->route('bots.index');
@@ -69,14 +71,75 @@ class BotController extends Controller
 
     public function destroy(Bot $bot): RedirectResponse
     {
+        Storage::disk('public')->delete("avatars/bot_{$bot->id}.jpg");
         $bot->delete();
 
         return redirect()->route('bots.index');
     }
 
+    public function syncAvatar(Bot $bot): RedirectResponse
+    {
+        $this->fetchAndStoreAvatar($bot);
+
+        return redirect()->route('bots.edit', $bot)->with('status', 'Avatar synced from Telegram.');
+    }
+
+    private function fetchAndStoreAvatar(Bot $bot): void
+    {
+        try {
+            $endpoint = config('services.telegram.endpoint');
+
+            $meResponse = Http::get("{$endpoint}{$bot->telegram_token}/getMe");
+            if (!$meResponse->successful()) {
+                return;
+            }
+            $botUserId = $meResponse->json('result.id');
+
+            $photosResponse = Http::get("{$endpoint}{$bot->telegram_token}/getUserProfilePhotos", [
+                'user_id' => $botUserId,
+                'limit'   => 1,
+            ]);
+            if (!$photosResponse->successful()) {
+                return;
+            }
+
+            $photos = $photosResponse->json('result.photos');
+            if (empty($photos)) {
+                return;
+            }
+
+            // Pick largest size (last item in sizes array)
+            $sizes   = $photos[0];
+            $largest = end($sizes);
+            $fileId  = $largest['file_id'];
+
+            $fileResponse = Http::get("{$endpoint}{$bot->telegram_token}/getFile", [
+                'file_id' => $fileId,
+            ]);
+            if (!$fileResponse->successful()) {
+                return;
+            }
+
+            $filePath = $fileResponse->json('result.file_path');
+            $fileUrl  = "https://api.telegram.org/file/bot{$bot->telegram_token}/{$filePath}";
+
+            $imageContents = Http::get($fileUrl)->body();
+            if (empty($imageContents)) {
+                return;
+            }
+
+            $storagePath = "avatars/bot_{$bot->id}.jpg";
+            Storage::disk('public')->put($storagePath, $imageContents);
+
+            $bot->update(['avatar_url' => Storage::disk('public')->url($storagePath)]);
+        } catch (\Throwable $e) {
+            Log::warning("Failed to fetch avatar for bot {$bot->id}: " . $e->getMessage());
+        }
+    }
+
     private function registerWebhook(Bot $bot): void
     {
-        $endpoint = config('services.telegram.endpoint');
+        $endpoint   = config('services.telegram.endpoint');
         $webhookUrl = url("/api/telegram/webhook/{$bot->telegram_token}");
 
         Http::get("{$endpoint}{$bot->telegram_token}/setWebhook", [

@@ -12,6 +12,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
     Route::resource('bots', BotController::class)->except(['show']);
+    Route::post('/bots/{bot}/sync-avatar', [BotController::class, 'syncAvatar'])->name('bots.sync-avatar');
 
     Route::get('/telegram-users', [TelegramUserController::class, 'index'])->name('telegram-users.index');
     Route::get('/telegram-users/{telegramUser}', [TelegramUserController::class, 'show'])->name('telegram-users.show');
