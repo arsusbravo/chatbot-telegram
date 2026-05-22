@@ -9,10 +9,12 @@ class ImageGenerationService
 {
     public function generateSelfie(string $referenceImageUrl): ?string
     {
+        $model = config('services.fal.model');
+
         $response = Http::withHeaders([
             'Authorization' => 'Key ' . config('services.fal.key'),
-        ])->timeout(60)->post('https://fal.run/fal-ai/pulid', [
-            'prompt'           => 'selfie photo, casual pose, holding phone up, natural lighting, photorealistic, high quality',
+        ])->timeout(60)->post("https://fal.run/{$model}", [
+            'prompt'           => 'close-up portrait of the person, smiling, tilted head, wet lips, random zoom to part of the body, highly detailed, photorealistic',
             'reference_images' => [['image_url' => $referenceImageUrl]],
             'image_size'       => 'portrait_4_3',
             'num_images'       => 1,
