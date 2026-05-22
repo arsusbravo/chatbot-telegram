@@ -7,7 +7,11 @@ use Illuminate\Support\Facades\Log;
 
 class ImageGenerationService
 {
-    private string $imagePrompt = 'Core Subject: A single half-body shot of the woman, Composition: casual smartphone selfie perspective, dynamic casual pose, off-center framing, looking over shoulder into the lens, eye-contact, Aesthetics & Vibe: highly inviting and confident expression, alluring gaze, subtle smirk, natural relaxed posture, Setting & Lighting: atmospheric depth, soft realistic shadows, high-quality rendering, Exclusions: no grids, no split screens, no multiple angles, no phone visible in hand.';
+    private string $imagePrompt = 'Core Subject: A single half-body shot of the woman from the reference image.
+Composition: Casual hand-held smartphone selfie perspective, dynamic asymmetric pose, intentional slight camera tilt, off-center framing, looking over shoulder into the lens, direct eye-contact.
+Aesthetics & Vibe: Highly inviting and confident expression, alluring gaze, subtle smirk, natural relaxed posture.
+Setting & Lighting: Photographed inside a casually detailed indoor room, warm ambient house lighting, soft realistic depth-of-field blurring the background elements, high-quality rendering.
+Exclusions: perfectly level horizon, straight studio alignment, grids, split screens, multiple angles, phone visible in hand.';
 
     public function generateSelfie(string $referenceImageUrl): ?string
     {
