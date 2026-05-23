@@ -28,14 +28,15 @@ deformed, bad anatomy, watermark, low quality";
         $response = Http::withHeaders([
             'Authorization' => 'Key ' . config('services.fal.key'),
         ])->timeout(180)->post("https://fal.run/{$model}", [
-            'prompt'              => $imagePrompt ?: $this->imagePrompt,
-            'negative_prompt'     => $negativePrompt ?: $this->imageNegativePrompt,
-            'reference_images'    => [['image_url' => $referenceImageUrl]],
-            'id_scale'            => 0.8,
-            'guidance_scale'      => 1.5,  // max is 1.5
-            'num_inference_steps' => 12,   // max is 12
-            'image_size'          => 'portrait_4_3',
-            'num_images'          => 1,
+            'prompt'                 => $imagePrompt ?: $this->imagePrompt,
+            'negative_prompt'        => $negativePrompt ?: $this->imageNegativePrompt,
+            'reference_image_url'    => $referenceImageUrl,
+            'id_weight'              => 1.0,
+            'guidance_scale'         => 4.0,
+            'num_inference_steps'    => 20,
+            'true_cfg'               => 1,
+            'image_size'             => 'portrait_4_3',
+            'num_images'             => 1,
         ]);
 
         if ($response->successful()) {
