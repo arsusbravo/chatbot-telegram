@@ -11,6 +11,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
 class GenerateSelfieJob implements ShouldQueue
@@ -32,6 +33,10 @@ class GenerateSelfieJob implements ShouldQueue
         $token    = $this->bot->telegram_token;
 
         try {
+            // Release the DB connection before the long fal.ai HTTP call so the
+            // web server isn't starved of connections during image generation.
+            DB::connection()->disconnect();
+
             $imageUrl = $service->generateSelfie($this->bot->avatar_url, $this->bot->image_prompt, $this->bot->negative_prompt);
 
             if ($imageUrl) {
