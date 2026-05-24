@@ -25,23 +25,23 @@ deformed, bad anatomy, watermark, low quality";
     {
         $model = config('services.fal.model');
 
-        $openingPrompt         = __('messages.selfie_default_prompt.main.opening');
-        $closingPrompt         = __('messages.selfie_default_prompt.main.closing');
-        $negativePrefix        = __('messages.selfie_default_prompt.negative');
+        $openingPrompt  = __('messages.selfie_default_prompt.main.opening');
+        $closingPrompt  = __('messages.selfie_default_prompt.main.closing');
+        $negativePrefix = __('messages.selfie_default_prompt.negative');
 
-        // Build final prompts
-        $finalPrompt = $imagePrompt
+        // If the lang key is missing, Laravel returns the key string itself.
+        $langLoaded = $openingPrompt !== 'messages.selfie_default_prompt.main.opening';
+
+        // Build final prompts — fall back to hardcoded defaults if lang file is missing
+        $finalPrompt = ($imagePrompt && $langLoaded)
             ? $openingPrompt . $imagePrompt . $closingPrompt
-            : $this->imagePrompt;
+            : ($imagePrompt ?: $this->imagePrompt);
 
-        // Always use the lang file prefix as the negative base.
-        // Append the row's extra terms if provided. Fall back to hardcoded default
-        // only when the lang key itself is missing (not yet deployed).
-        $finalNegativePrompt = is_string($negativePrefix) && $negativePrefix !== 'messages.selfie_default_prompt.negative'
+        $finalNegativePrompt = $langLoaded
             ? $negativePrefix . ($negativePrompt ?? '')
             : ($negativePrompt ?? $this->imageNegativePrompt);
 
-        Log::info('fal.ai selfie request', [
+        Log::error('fal.ai selfie request', [
             'model'           => $model,
             'prompt'          => $finalPrompt,
             'negative_prompt' => $finalNegativePrompt,
