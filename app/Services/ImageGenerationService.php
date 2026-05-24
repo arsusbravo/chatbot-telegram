@@ -24,22 +24,42 @@ deformed, bad anatomy, watermark, low quality";
     public function generateSelfie(string $referenceImageUrl, ?string $imagePrompt = null, ?string $negativePrompt = null): ?string
     {
         $model = config('services.fal.model');
-        $openingPrompt = __('messages.selfie_default_prompt.main.opening');
-        $closingPrompt = __('messages.selfie_default_prompt.main.closing');
-        $defaultNegativePrompt = __('messages.selfie_default_prompt.negative');
+
+        $openingPrompt         = __('messages.selfie_default_prompt.main.opening');
+        $closingPrompt         = __('messages.selfie_default_prompt.main.closing');
+        $negativePrefix        = __('messages.selfie_default_prompt.negative');
+
+        // Build final prompts
+        $finalPrompt = $imagePrompt
+            ? $openingPrompt . $imagePrompt . $closingPrompt
+            : $this->imagePrompt;
+
+        // Always use the lang file prefix as the negative base.
+        // Append the row's extra terms if provided. Fall back to hardcoded default
+        // only when the lang key itself is missing (not yet deployed).
+        $finalNegativePrompt = is_string($negativePrefix) && $negativePrefix !== 'messages.selfie_default_prompt.negative'
+            ? $negativePrefix . ($negativePrompt ?? '')
+            : ($negativePrompt ?? $this->imageNegativePrompt);
+
+        Log::info('fal.ai selfie request', [
+            'model'           => $model,
+            'prompt'          => $finalPrompt,
+            'negative_prompt' => $finalNegativePrompt,
+            'reference_image' => $referenceImageUrl,
+        ]);
 
         $response = Http::withHeaders([
             'Authorization' => 'Key ' . config('services.fal.key'),
         ])->timeout(180)->post("https://fal.run/{$model}", [
-            'prompt'                 => $imagePrompt ? $openingPrompt . $imagePrompt . $closingPrompt : $this->imagePrompt,
-            'negative_prompt'        => $negativePrompt ? $defaultNegativePrompt . $negativePrompt: $this->imageNegativePrompt,
-            'reference_image_url'    => $referenceImageUrl,
-            'id_weight'              => 1.0,
-            'guidance_scale'         => 4.0,
-            'num_inference_steps'    => 20,
-            'true_cfg'               => 1,
-            'image_size'             => 'portrait_4_3',
-            'num_images'             => 1,
+            'prompt'              => $finalPrompt,
+            'negative_prompt'     => $finalNegativePrompt,
+            'reference_image_url' => $referenceImageUrl,
+            'id_weight'           => 1.0,
+            'guidance_scale'      => 4.0,
+            'num_inference_steps' => 20,
+            'true_cfg'            => 1,
+            'image_size'          => 'portrait_4_3',
+            'num_images'          => 1,
         ]);
 
         if ($response->successful()) {
