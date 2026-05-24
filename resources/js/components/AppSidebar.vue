@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, Bot, FolderGit2, LayoutGrid, Users } from 'lucide-vue-next';
+import { BookOpen, Bot, FolderGit2, Image, LayoutGrid, Users } from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as botsIndex } from '@/routes/bots';
+import { index as imagePromptsIndex } from '@/routes/image-prompts';
 import { index as telegramUsersIndex } from '@/routes/telegram-users';
 import type { NavItem } from '@/types';
 
@@ -34,6 +35,11 @@ const mainNavItems: NavItem[] = [
         title: 'Users',
         href: telegramUsersIndex(),
         icon: Users,
+    },
+    {
+        title: 'Selfie Prompts',
+        href: imagePromptsIndex(),
+        icon: Image,
     },
 ];
 

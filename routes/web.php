@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BotController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ImagePromptController;
 use App\Http\Controllers\TelegramUserController;
 use App\Http\Controllers\WelcomeController;
 
@@ -13,6 +14,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('bots', BotController::class)->except(['show']);
     Route::post('/bots/{bot}/sync-avatar', [BotController::class, 'syncAvatar'])->name('bots.sync-avatar');
+
+    Route::resource('image-prompts', ImagePromptController::class)->except(['show']);
 
     Route::get('/telegram-users', [TelegramUserController::class, 'index'])->name('telegram-users.index');
     Route::get('/telegram-users/{telegramUser}', [TelegramUserController::class, 'show'])->name('telegram-users.show');

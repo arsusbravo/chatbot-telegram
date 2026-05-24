@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, useForm } from '@inertiajs/vue3';
 import { index, store } from '@/routes/bots';
 
 defineOptions({
@@ -16,8 +16,6 @@ const form = useForm({
     telegram_token: '',
     telegram_username: '',
     system_prompt: '',
-    image_prompt: '',
-    negative_prompt: '',
 });
 
 function submit() {
@@ -75,30 +73,6 @@ function submit() {
                     class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500"
                 />
                 <p v-if="form.errors.system_prompt" class="text-red-500 text-sm mt-1">{{ form.errors.system_prompt }}</p>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Image Prompt</label>
-                <textarea
-                    v-model="form.image_prompt"
-                    rows="5"
-                    placeholder="Leave blank to use the default prompt..."
-                    class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-                />
-                <p class="text-xs text-gray-400 mt-1">Describes what the selfie should look like. Leave blank to use the system default.</p>
-                <p v-if="form.errors.image_prompt" class="text-red-500 text-sm mt-1">{{ form.errors.image_prompt }}</p>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Negative Prompt</label>
-                <textarea
-                    v-model="form.negative_prompt"
-                    rows="3"
-                    placeholder="Leave blank to use the default negative prompt..."
-                    class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-                />
-                <p class="text-xs text-gray-400 mt-1">Things to exclude from the image. Leave blank to use the system default.</p>
-                <p v-if="form.errors.negative_prompt" class="text-red-500 text-sm mt-1">{{ form.errors.negative_prompt }}</p>
             </div>
 
             <button

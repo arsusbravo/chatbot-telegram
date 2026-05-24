@@ -32,8 +32,6 @@ class BotController extends Controller
             'telegram_token'    => 'required|string|unique:bots,telegram_token',
             'telegram_username' => 'required|string|unique:bots,telegram_username',
             'system_prompt'     => 'required|string',
-            'image_prompt'      => 'nullable|string',
-            'negative_prompt'   => 'nullable|string',
         ]);
 
         $bot = Bot::create($validated);
@@ -58,8 +56,6 @@ class BotController extends Controller
             'telegram_token'    => 'required|string|unique:bots,telegram_token,' . $bot->id,
             'telegram_username' => 'required|string|unique:bots,telegram_username,' . $bot->id,
             'system_prompt'     => 'required|string',
-            'image_prompt'      => 'nullable|string',
-            'negative_prompt'   => 'nullable|string',
             'is_active'         => 'boolean',
         ]);
 

@@ -1,0 +1,80 @@
+<script setup lang="ts">
+import { Head, useForm } from '@inertiajs/vue3';
+import { index, update } from '@/routes/image-prompts';
+import type { ImagePrompt } from '@/types';
+
+const props = defineProps<{
+    prompt: ImagePrompt;
+    opening_prompt: string;
+    closing_prompt: string;
+    negative_prefix: string;
+}>();
+
+defineOptions({
+    layout: {
+        breadcrumbs: [
+            { title: 'Selfie Prompts', href: index.url() },
+            { title: 'Edit Prompt', href: '#' },
+        ],
+    },
+});
+
+const form = useForm({
+    label: props.prompt.label,
+    prompt: props.prompt.prompt,
+    negative_prompt: props.prompt.negative_prompt ?? '',
+});
+
+function submit() {
+    form.put(update.url(props.prompt.id));
+}
+</script>
+
+<template>
+    <Head :title="`Edit — ${prompt.label}`" />
+
+    <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4 max-w-2xl">
+        <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border p-6 space-y-5">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Label</label>
+                <input
+                    v-model="form.label"
+                    type="text"
+                    class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                />
+                <p v-if="form.errors.label" class="text-red-500 text-sm mt-1">{{ form.errors.label }}</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prompt</label>
+                <pre class="w-full rounded-lg rounded-b-none border border-b-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 text-xs font-mono px-3 py-2 whitespace-pre-wrap">{{ props.opening_prompt }}</pre>
+                <textarea
+                    v-model="form.prompt"
+                    rows="6"
+                    class="w-full rounded-none border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm font-mono"
+                />
+                <pre class="w-full rounded-lg rounded-t-none border border-t-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 text-xs font-mono px-3 py-2 whitespace-pre-wrap">{{ props.closing_prompt }}</pre>
+                <p v-if="form.errors.prompt" class="text-red-500 text-sm mt-1">{{ form.errors.prompt }}</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Negative Prompt <span class="font-normal text-gray-400">(optional)</span></label>
+                <pre class="w-full rounded-lg rounded-b-none border border-b-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 text-xs font-mono px-3 py-2 whitespace-pre-wrap">{{ props.negative_prefix }}</pre>
+                <textarea
+                    v-model="form.negative_prompt"
+                    rows="3"
+                    class="w-full rounded-lg rounded-t-none border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm font-mono"
+                />
+                <p v-if="form.errors.negative_prompt" class="text-red-500 text-sm mt-1">{{ form.errors.negative_prompt }}</p>
+            </div>
+
+            <button
+                @click="submit"
+                :disabled="form.processing"
+                class="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium disabled:opacity-50"
+            >
+                Save Changes
+            </button>
+        </div>
+    </div>
+</template>

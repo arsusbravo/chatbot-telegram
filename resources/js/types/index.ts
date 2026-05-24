@@ -8,8 +8,6 @@ export interface Bot {
     telegram_token: string;
     telegram_username: string;
     system_prompt: string;
-    image_prompt: string | null;
-    negative_prompt: string | null;
     is_active: boolean;
     avatar_url?: string | null;
     messages_count?: number;
@@ -38,6 +36,15 @@ export interface Message {
     created_at: string;
     bot?: Bot;
     telegram_user?: TelegramUser;
+}
+
+export interface ImagePrompt {
+    id: number;
+    label: string;
+    prompt: string;
+    negative_prompt: string | null;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface PaginatedData<T> {

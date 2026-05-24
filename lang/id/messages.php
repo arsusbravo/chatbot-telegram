@@ -36,6 +36,20 @@ return [
         'mana selfie', 'mana foto', 'mana photo', 'mana potret',
     ],
 
+    'selfie_default_prompt' => [
+        'main' => [
+            'opening' => 'POV selfie shot, upper body, extreme close-up, one arm visible, 
+very curvy hourglass figure, voluptuous large bust, wide hips, slim waist,
+',
+            'closing' => '
+8k'
+        ],
+        'negative' => 'camera visible, device in hand,
+gray background, studio lighting, 
+deformed, bad anatomy, watermark, low quality,
+        '
+    ],
+
     // AI errors
     'ai_confused'    => 'Maaf, aku lagi bingung... coba lagi ya 🥺',
     'ai_tired'       => 'Sayang, aku lagi capek banget nih 😴 Coba chat aku lagi nanti ya~',

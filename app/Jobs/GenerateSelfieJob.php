@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Bot;
+use App\Models\ImagePrompt;
 use App\Models\TelegramUser;
 use App\Services\ImageGenerationService;
 use Illuminate\Bus\Queueable;
@@ -33,11 +34,15 @@ class GenerateSelfieJob implements ShouldQueue
         $token    = $this->bot->telegram_token;
 
         try {
+            $promptRow      = ImagePrompt::inRandomOrder()->first();
+            $imagePrompt    = $promptRow?->prompt;
+            $negativePrompt = $promptRow?->negative_prompt;
+
             // Release the DB connection before the long fal.ai HTTP call so the
             // web server isn't starved of connections during image generation.
             DB::connection()->disconnect();
 
-            $imageUrl = $service->generateSelfie($this->bot->avatar_url, $this->bot->image_prompt, $this->bot->negative_prompt);
+            $imageUrl = $service->generateSelfie($this->bot->avatar_url, $imagePrompt, $negativePrompt);
 
             if ($imageUrl) {
                 $this->user->messages()->create(['role' => 'user',      'content' => $this->userText,   'bot_id' => $this->bot->id]);
