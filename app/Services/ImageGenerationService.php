@@ -44,8 +44,8 @@ deformed, bad anatomy, watermark, low quality";
         $response = Http::withHeaders([
             'Authorization' => 'Key ' . config('services.fal.key'),
         ])->timeout(180)->post("https://fal.run/{$model}", [
-            'prompt'              => "POV selfie, upper body, direct eye contact, low-cut v-neck crop top, visible décolletage, cleavage showing, photorealistic, 8k",
-            'negative_prompt'     => 'full body, legs, deformed, bad anatomy, watermark, low quality',
+            'prompt'              => $finalPrompt,
+            'negative_prompt'     => $finalNegativePrompt,
             'reference_image_url' => $referenceImageUrl,
             'id_weight'           => 0.6,
             'guidance_scale'      => 5.5,
