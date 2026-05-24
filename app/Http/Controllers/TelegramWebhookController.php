@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\GenerateSelfieJob;
 use App\Models\Bot;
+use App\Models\ImagePrompt;
 use App\Models\Message;
 use App\Models\TelegramUser;
 use App\Services\NowPaymentsService;
@@ -68,11 +69,21 @@ class TelegramWebhookController extends Controller
 
             Cache::put($lockKey, true, now()->addMinutes(5));
 
+            $promptRow      = ImagePrompt::inRandomOrder()->first();
+            $imagePrompt    = $promptRow?->prompt;
+            $negativePrompt = $promptRow?->negative_prompt;
+
+            Log::error('Selfie dispatch', [
+                'prompt_label'    => $promptRow?->label,
+                'image_prompt'    => $imagePrompt,
+                'negative_prompt' => $negativePrompt,
+            ]);
+
             $waitingMessages = __('messages.selfie_waiting');
             $this->sendMessage($bot, $chatId, $waitingMessages[array_rand($waitingMessages)]);
             $this->sendChatAction($bot, $chatId, 'upload_photo');
 
-            GenerateSelfieJob::dispatch($bot, $user, $chatId, $text);
+            GenerateSelfieJob::dispatch($bot, $user, $chatId, $text, $imagePrompt, $negativePrompt);
 
             return response()->json(['ok' => true]);
         }

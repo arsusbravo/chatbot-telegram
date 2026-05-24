@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Models\Bot;
-use App\Models\ImagePrompt;
 use App\Models\TelegramUser;
 use App\Services\ImageGenerationService;
 use Illuminate\Bus\Queueable;
@@ -14,7 +13,6 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 class GenerateSelfieJob implements ShouldQueue
 {
@@ -27,6 +25,8 @@ class GenerateSelfieJob implements ShouldQueue
         public readonly TelegramUser $user,
         public readonly int $chatId,
         public readonly string $userText,
+        public readonly ?string $imagePrompt = null,
+        public readonly ?string $negativePrompt = null,
     ) {}
 
     public function handle(ImageGenerationService $service): void
@@ -35,18 +35,11 @@ class GenerateSelfieJob implements ShouldQueue
         $token    = $this->bot->telegram_token;
 
         try {
-            $promptRow      = ImagePrompt::inRandomOrder()->first();
-            $imagePrompt    = $promptRow?->prompt;
-            $negativePrompt = $promptRow?->negative_prompt;
-
             // Release the DB connection before the long fal.ai HTTP call so the
             // web server isn't starved of connections during image generation.
             DB::connection()->disconnect();
 
-
-            Log::error('lets generate selfie');
-
-            $imageUrl = $service->generateSelfie($this->bot->avatar_url, $imagePrompt, $negativePrompt);
+            $imageUrl = $service->generateSelfie($this->bot->avatar_url, $this->imagePrompt, $this->negativePrompt);
 
             if ($imageUrl) {
                 $this->user->messages()->create(['role' => 'user',      'content' => $this->userText,   'bot_id' => $this->bot->id]);
