@@ -23,7 +23,6 @@ deformed, bad anatomy, watermark, low quality";
 
     public function generateSelfie(string $referenceImageUrl, ?string $imagePrompt = null, ?string $negativePrompt = null): ?string
     {
-        Log::error('start generating image');
         $model = config('services.fal.model');
 
         $openingPrompt  = __('messages.selfie_default_prompt.main.opening');
@@ -42,21 +41,14 @@ deformed, bad anatomy, watermark, low quality";
             ? $negativePrefix . ($negativePrompt ?? '')
             : ($negativePrompt ?? $this->imageNegativePrompt);
 
-        Log::error('fal.ai selfie request', [
-            'model'           => $model,
-            'prompt'          => $finalPrompt,
-            'negative_prompt' => $finalNegativePrompt,
-            'reference_image' => $referenceImageUrl,
-        ]);
-
         $response = Http::withHeaders([
             'Authorization' => 'Key ' . config('services.fal.key'),
         ])->timeout(180)->post("https://fal.run/{$model}", [
             'prompt'              => $finalPrompt,
             'negative_prompt'     => $finalNegativePrompt,
             'reference_image_url' => $referenceImageUrl,
-            'id_weight'           => 1.0,
-            'guidance_scale'      => 4.0,
+            'id_weight'           => 0.6,
+            'guidance_scale'      => 5.5,
             'num_inference_steps' => 20,
             'true_cfg'            => 1,
             'image_size'          => 'portrait_4_3',
