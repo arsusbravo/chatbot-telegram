@@ -38,16 +38,15 @@ return [
 
     'selfie_default_prompt' => [
         'main' => [
-            'opening' => 'POV selfie shot, upper body, extreme close-up, one arm visible, 
+            'opening' => 'POV selfie shot, upper body, extreme close-up,
 very curvy hourglass figure, voluptuous large bust, wide hips, slim waist,
 ',
-            'closing' => '
-8k'
+            'closing' => ' 8k'
         ],
         'negative' => 'camera visible, device in hand,
 gray background, studio lighting, 
 deformed, bad anatomy, watermark, low quality,
-        '
+'
     ],
 
     // AI errors
