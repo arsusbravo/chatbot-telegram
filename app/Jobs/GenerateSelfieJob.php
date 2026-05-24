@@ -14,6 +14,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class GenerateSelfieJob implements ShouldQueue
 {
@@ -41,6 +42,9 @@ class GenerateSelfieJob implements ShouldQueue
             // Release the DB connection before the long fal.ai HTTP call so the
             // web server isn't starved of connections during image generation.
             DB::connection()->disconnect();
+
+
+            Log::error('lets generate selfie');
 
             $imageUrl = $service->generateSelfie($this->bot->avatar_url, $imagePrompt, $negativePrompt);
 

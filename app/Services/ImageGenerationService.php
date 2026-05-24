@@ -23,6 +23,7 @@ deformed, bad anatomy, watermark, low quality";
 
     public function generateSelfie(string $referenceImageUrl, ?string $imagePrompt = null, ?string $negativePrompt = null): ?string
     {
+        Log::error('start generating image');
         $model = config('services.fal.model');
 
         $openingPrompt  = __('messages.selfie_default_prompt.main.opening');
