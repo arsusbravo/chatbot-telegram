@@ -53,7 +53,7 @@ deformed, bad anatomy, watermark, low quality";
             'true_cfg'            => 1,
             'image_size'          => 'portrait_4_3',
             'num_images'          => 1,
-            'seed'                => rand(1, 9999999),
+            'seed'                => random_int(1, 2147483647),
         ]);
 
         if ($response->successful()) {
