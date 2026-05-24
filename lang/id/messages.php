@@ -38,8 +38,8 @@ return [
 
     'selfie_default_prompt' => [
         'main' => [
-            'opening' => 'POV selfie shot, upper body, extreme close-up,
-very curvy hourglass figure, voluptuous large bust, wide hips, slim waist,
+            'opening' => 'POV selfie shot, upper body framed from chest to head,
+slight downward angle from above, one arm out of frame,
 ',
             'closing' => ' 8k'
         ],
