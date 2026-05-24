@@ -73,10 +73,24 @@ class TelegramWebhookController extends Controller
             $imagePrompt    = $promptRow?->prompt;
             $negativePrompt = $promptRow?->negative_prompt;
 
+            $opening        = __('messages.selfie_default_prompt.main.opening');
+            $closing        = __('messages.selfie_default_prompt.main.closing');
+            $negativePrefix = __('messages.selfie_default_prompt.negative');
+            $langLoaded     = $opening !== 'messages.selfie_default_prompt.main.opening';
+
+            $fullPrompt = ($imagePrompt && $langLoaded)
+                ? $opening . $imagePrompt . $closing
+                : ($imagePrompt ?: '(service hardcoded default)');
+
+            $fullNegative = $langLoaded
+                ? $negativePrefix . ($negativePrompt ?? '')
+                : ($negativePrompt ?? '(service hardcoded default)');
+
             Log::error('Selfie dispatch', [
-                'prompt_label'    => $promptRow?->label,
-                'image_prompt'    => $imagePrompt,
-                'negative_prompt' => $negativePrompt,
+                'label'            => $promptRow?->label ?? '(none)',
+                'lang_loaded'      => $langLoaded,
+                'full_prompt'      => $fullPrompt,
+                'full_negative'    => $fullNegative,
             ]);
 
             $waitingMessages = __('messages.selfie_waiting');
