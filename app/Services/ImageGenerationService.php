@@ -46,8 +46,8 @@ deformed, bad anatomy, watermark, low quality";
         ])->timeout(180)->post("https://fal.run/{$model}", [
             'prompt'              => "POV selfie, upper body, direct eye contact, low-cut v-neck crop top, visible décolletage, cleavage showing, photorealistic, 8k",
             'negative_prompt'     => 'full body, legs, deformed, bad anatomy, watermark, low quality',
-            'reference_image_url' => $referenceImageUrl,
-            'id_weight'           => 0.3,
+            'reference_images'    => [['image_url' => $referenceImageUrl]],
+            'id_scale'            => 0.8,
             'guidance_scale'      => 8.0,
             'num_inference_steps' => 20,
             'true_cfg'            => 1,
