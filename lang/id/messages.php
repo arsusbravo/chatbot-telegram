@@ -37,6 +37,8 @@ return [
         'lihat selfie', 'lihat foto', 'lihat photo', 'lihat potret',
         'mau selfie', 'mau foto', 'mau photo', 'mau potret',
         'mana selfie', 'mana foto', 'mana photo', 'mana potret',
+        'liat selfie', 'liat foto', 'liat photo', 'liat potret',
+        'lihat selfie', 'lihat foto', 'lihat photo', 'lihat potret',
     ],
 
     'selfie_default_prompt' => [
