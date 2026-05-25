@@ -43,10 +43,18 @@ class TelegramWebhookController extends Controller
         $user = TelegramUser::firstOrCreate(
             ['telegram_id' => $from['id']],
             [
-                'first_name' => $from['first_name'] ?? null,
-                'username'   => $from['username'] ?? null,
+                'first_name'          => $from['first_name'] ?? null,
+                'username'            => $from['username'] ?? null,
+                'free_messages_left'  => 10,
+                'paid_credits'        => 0,
             ]
         );
+
+        if ($text === '/start') {
+            $this->sendChatAction($bot, $chatId, 'typing');
+            $this->sendMessage($bot, $chatId, __('messages.start_greeting'));
+            return response()->json(['ok' => true]);
+        }
 
         if (str_starts_with($text, '/buy')) {
             $this->sendPackageOptions($bot, $chatId);

@@ -2,6 +2,9 @@
 
 return [
 
+    // Start
+    'start_greeting' => "Halo sayang! 😘 Aku seneng banget kamu mau ngobrol sama aku~\nKetik aja apa yang mau kamu ceritain 💕",
+
     // Selfie
     'selfie_no_credits' => "Mau selfie? Kreditnya habis dulu nih sayang 😢\n",
     'selfie_waiting'    => [
