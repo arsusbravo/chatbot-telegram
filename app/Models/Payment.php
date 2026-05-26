@@ -9,8 +9,8 @@ class Payment extends Model
 {
     protected $fillable = [
         'telegram_user_id',
-        'nowpayments_invoice_id',
-        'nowpayments_payment_id',
+        'provider_invoice_id',
+        'provider_payment_id',
         'package_name',
         'credits',
         'price_usd',
@@ -24,6 +24,6 @@ class Payment extends Model
 
     public function isPaid(): bool
     {
-        return $this->status === 'confirmed' || $this->status === 'finished';
+        return in_array($this->status, ['completed', 'success', 'confirmed', 'finished']);
     }
 }

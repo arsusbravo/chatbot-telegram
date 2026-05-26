@@ -7,7 +7,7 @@ use App\Models\Bot;
 use App\Models\ImagePrompt;
 use App\Models\Message;
 use App\Models\TelegramUser;
-use App\Services\NowPaymentsService;
+use App\Services\TransFiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -208,7 +208,7 @@ class TelegramWebhookController extends Controller
 
         $this->sendChatAction($bot, $chatId, 'typing');
 
-        $service = app(NowPaymentsService::class);
+        $service = app(TransFiService::class);
         $invoice = $service->createInvoice($user, $packages[$packageIndex]);
 
         if ($invoice) {

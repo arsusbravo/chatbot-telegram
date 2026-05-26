@@ -1,0 +1,106 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Payment;
+use App\Models\TelegramUser;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+class TransFiService
+{
+    private string $endpoint;
+    private string $clientId;
+    private string $clientSecret;
+
+    public function __construct()
+    {
+        $this->endpoint     = config('services.transfi.endpoint');
+        $this->clientId     = config('services.transfi.client_id');
+        $this->clientSecret = config('services.transfi.client_secret');
+    }
+
+    /**
+     * Create a hosted payment order and return the checkout URL.
+     * Returns ['invoice_url' => string, 'payment_id' => string] or null on failure.
+     */
+    public function createInvoice(TelegramUser $user, array $package): ?array
+    {
+        $payment = Payment::create([
+            'telegram_user_id' => $user->id,
+            'package_name'     => $package['name'],
+            'credits'          => $package['credits'],
+            'price_usd'        => $package['price'],
+        ]);
+
+        $botUsername = $user->lastBotUsername() ?? config('app.name');
+
+        // Confirmed: TransFi uses Basic auth (username:password from Settings → Integration tab)
+        $body = [
+            'orderType'          => 'gaming',            // confirmed from TransFi payin docs
+            'purposeCode'        => 'company_expenses',  // TODO: CONFIRM best value for AI chatbot credits
+            'partnerId'          => (string) $payment->id,
+            'source'             => [
+                'currency' => config('services.transfi.source_currency', 'USDT'),
+                'amount'   => (string) $package['price'],
+                // TODO: CONFIRM paymentType/paymentCode for crypto source payments
+                // Example for fiat: 'paymentType' => 'bank_transfer', 'paymentCode' => 'swift'
+            ],
+            'destination'        => [
+                'currency' => config('services.transfi.dest_currency', 'USDT'),
+            ],
+            'successRedirectUrl' => 'https://t.me/' . $botUsername,
+            'failureRedirectUrl' => 'https://t.me/' . $botUsername,
+            'customerMetaData'   => [
+                'customerId' => (string) $user->id,
+            ],
+        ];
+
+        // TransFi requires userId (format: UX-XXXXXXX) for gaming orders.
+        // Set TRANSFI_USER_ID in .env once TransFi provides it.
+        // TODO: CONFIRM with TransFi whether this is a per-user ID or a single merchant ID.
+        $userId = config('services.transfi.user_id');
+        if ($userId) {
+            $body['userId'] = $userId;
+        }
+
+        $response = Http::withBasicAuth($this->clientId, $this->clientSecret)
+            ->post("{$this->endpoint}/v3/orders", $body);
+
+        if ($response->successful()) {
+            $data = $response->json();
+
+            // Confirmed: response structure is { "status": "success", "data": { "orderId": "...", "payUrl": "..." } }
+            $invoiceUrl        = $data['data']['payUrl']    ?? null;
+            $providerInvoiceId = $data['data']['orderId']   ?? null;
+
+            if (!$invoiceUrl) {
+                Log::error('TransFi: could not extract payUrl from response', $data);
+                $payment->update(['status' => 'failed']);
+                return null;
+            }
+
+            $payment->update(['provider_invoice_id' => $providerInvoiceId]);
+
+            return [
+                'invoice_url' => $invoiceUrl,
+                'payment_id'  => $payment->id,
+            ];
+        }
+
+        Log::error('TransFi invoice error:', $response->json() ?? []);
+        $payment->update(['status' => 'failed']);
+
+        return null;
+    }
+
+    public function verifySignature(string $payload, string $signature): bool
+    {
+        $secret = config('services.transfi.webhook_secret');
+
+        // Confirmed: HMAC-SHA256 of the raw request body, compared against X-Transfi-Hmac-Hash header
+        $expected = hash_hmac('sha256', $payload, $secret);
+
+        return hash_equals($expected, $signature);
+    }
+}

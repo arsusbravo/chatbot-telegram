@@ -50,10 +50,14 @@ return [
         'model' => env('FAL_MODEL', 'fal-ai/pulid'),
     ],
 
-    'nowpayments' => [
-        'api_key' => env('NOWPAYMENTS_API_KEY'),
-        'ipn_secret' => env('NOWPAYMENTS_IPN_SECRET'),
-        'endpoint' => env('ENDPOINT_NOWPAYMENTS', 'https://api.nowpayments.io/v1'),
+    'transfi' => [
+        'client_id'       => env('TRANSFI_CLIENT_ID'),
+        'client_secret'   => env('TRANSFI_CLIENT_SECRET'),
+        'webhook_secret'  => env('TRANSFI_WEBHOOK_SECRET'),
+        'endpoint'        => env('TRANSFI_ENDPOINT', 'https://api.transfi.com'),
+        'user_id'         => env('TRANSFI_USER_ID'),          // TransFi userId (UX-XXXXXXX), required for gaming orders
+        'source_currency' => env('TRANSFI_SOURCE_CURRENCY', 'USDT'),  // crypto the user pays with
+        'dest_currency'   => env('TRANSFI_DEST_CURRENCY',   'USDT'),  // crypto the merchant receives
     ],
 
 ];
