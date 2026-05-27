@@ -232,6 +232,26 @@ class TelegramWebhookController extends Controller
                 if (!Cache::has($lockKey)) {
                     Cache::put($lockKey, true, now()->addMinutes(5));
 
+                    $opening        = __('messages.selfie_default_prompt.main.opening');
+                    $closing        = __('messages.selfie_default_prompt.main.closing');
+                    $negativePrefix = __('messages.selfie_default_prompt.negative');
+                    $langLoaded     = $opening !== 'messages.selfie_default_prompt.main.opening';
+
+                    $fullPrompt = ($pending['image_prompt'] && $langLoaded)
+                        ? $opening . $pending['image_prompt'] . $closing
+                        : ($pending['image_prompt'] ?: '(service hardcoded default)');
+
+                    $fullNegative = $langLoaded
+                        ? $negativePrefix . ($pending['negative_prompt'] ?? '')
+                        : ($pending['negative_prompt'] ?? '(service hardcoded default)');
+
+                    Log::error('Selfie dispatch (from confirm)', [
+                        'lang_loaded'      => $langLoaded,
+                        'image_prompt_raw' => $pending['image_prompt'],
+                        'full_prompt'      => $fullPrompt,
+                        'full_negative'    => $fullNegative,
+                    ]);
+
                     $waitingMessages = __('messages.selfie_waiting');
                     $this->sendMessage($bot, $chatId, $waitingMessages[array_rand($waitingMessages)]);
                     $this->sendChatAction($bot, $chatId, 'upload_photo');

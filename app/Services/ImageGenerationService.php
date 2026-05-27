@@ -41,9 +41,7 @@ deformed, bad anatomy, watermark, low quality";
             ? $negativePrefix . ($negativePrompt ?? '')
             : ($negativePrompt ?? $this->imageNegativePrompt);
 
-        $response = Http::withHeaders([
-            'Authorization' => 'Key ' . config('services.fal.key'),
-        ])->timeout(180)->post("https://fal.run/{$model}", [
+        $payload = [
             'prompt'              => $finalPrompt,
             'negative_prompt'     => $finalNegativePrompt,
             'reference_image_url' => $referenceImageUrl,
@@ -54,10 +52,25 @@ deformed, bad anatomy, watermark, low quality";
             'image_size'          => 'portrait_4_3',
             'num_images'          => 1,
             'seed'                => random_int(1, 2147483647),
+        ];
+
+        Log::info('fal.ai request', [
+            'model'           => $model,
+            'lang_loaded'     => $langLoaded,
+            'prompt'          => $finalPrompt,
+            'negative_prompt' => $finalNegativePrompt,
+            'reference_url'   => $referenceImageUrl,
+            'seed'            => $payload['seed'],
         ]);
 
+        $response = Http::withHeaders([
+            'Authorization' => 'Key ' . config('services.fal.key'),
+        ])->timeout(180)->post("https://fal.run/{$model}", $payload);
+
         if ($response->successful()) {
-            return $response->json('images.0.url');
+            $imageUrl = $response->json('images.0.url');
+            Log::info('fal.ai response OK', ['image_url' => $imageUrl]);
+            return $imageUrl;
         }
 
         Log::error('fal.ai PuLID error', [
