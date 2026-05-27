@@ -26,6 +26,11 @@ return [
     'payment_success'  => "✅ Paket :name (:credits kredit)\n\n💳 Bayar di sini sayang:\n:url\n\nSetelah bayar, kreditmu otomatis ditambahkan ya~ 💕",
     'payment_error'    => '⚠️ Maaf, pembayaran lagi gangguan. Coba lagi nanti ya sayang~',
 
+    // Selfie confirmation
+    'selfie_confirm'     => "Maaf mas, minta foto sungguhan bisa abis 5 kredit, mas mau? Kalau tidak aku kirim foto-fotoan aja ya 😊",
+    'selfie_confirm_yes' => "✅ Mau! (5 kredit)",
+    'selfie_confirm_no'  => "❌ Gak usah deh",
+
     // Selfie keyword detection
     'selfie_keywords' => [
         'minta selfie', 'minta foto', 'minta photo', 'minta potret',

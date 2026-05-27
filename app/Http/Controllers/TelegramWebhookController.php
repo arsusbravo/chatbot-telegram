@@ -51,6 +51,7 @@ class TelegramWebhookController extends Controller
         );
 
         if ($text === '/start') {
+            Cache::forget("selfie_confirmed_{$user->telegram_id}");
             $this->sendChatAction($bot, $chatId, 'typing');
             $this->sendMessage($bot, $chatId, __('messages.start_greeting'));
             return response()->json(['ok' => true]);
@@ -75,11 +76,23 @@ class TelegramWebhookController extends Controller
                 return response()->json(['ok' => true]);
             }
 
-            Cache::put($lockKey, true, now()->addMinutes(5));
-
             $promptRow      = ImagePrompt::inRandomOrder()->first();
             $imagePrompt    = $promptRow?->prompt;
             $negativePrompt = $promptRow?->negative_prompt;
+
+            // First-time (or cache-cleared) confirmation gate
+            if (!Cache::has("selfie_confirmed_{$user->telegram_id}")) {
+                Cache::put("selfie_pending_confirm_{$user->telegram_id}", [
+                    'text'            => $text,
+                    'image_prompt'    => $imagePrompt,
+                    'negative_prompt' => $negativePrompt,
+                ], now()->addMinutes(10));
+                $this->sendSelfieConfirmation($bot, $chatId);
+                return response()->json(['ok' => true]);
+            }
+
+            // Already confirmed → dispatch immediately
+            Cache::put($lockKey, true, now()->addMinutes(5));
 
             $opening        = __('messages.selfie_default_prompt.main.opening');
             $closing        = __('messages.selfie_default_prompt.main.closing');
@@ -175,6 +188,18 @@ class TelegramWebhookController extends Controller
         ]);
     }
 
+    private function sendSelfieConfirmation(Bot $bot, int $chatId): void
+    {
+        Http::post(config('services.telegram.endpoint') . "{$bot->telegram_token}/sendMessage", [
+            'chat_id'      => $chatId,
+            'text'         => __('messages.selfie_confirm'),
+            'reply_markup' => json_encode(['inline_keyboard' => [[
+                ['text' => __('messages.selfie_confirm_yes'), 'callback_data' => 'selfie:confirm'],
+                ['text' => __('messages.selfie_confirm_no'),  'callback_data' => 'selfie:decline'],
+            ]]]),
+        ]);
+    }
+
     private function handleCallback(Bot $bot, array $callback): void
     {
         $chatId     = $callback['message']['chat']['id'];
@@ -182,6 +207,65 @@ class TelegramWebhookController extends Controller
         $data       = $callback['data'] ?? '';
         $callbackId = $callback['id'];
 
+        // Selfie confirmation callbacks
+        if (str_starts_with($data, 'selfie:')) {
+            Http::post(config('services.telegram.endpoint') . "{$bot->telegram_token}/answerCallbackQuery", [
+                'callback_query_id' => $callbackId,
+            ]);
+
+            $user = TelegramUser::firstOrCreate(
+                ['telegram_id' => $from['id']],
+                [
+                    'first_name' => $from['first_name'] ?? null,
+                    'username'   => $from['username'] ?? null,
+                ]
+            );
+
+            $pendingKey = "selfie_pending_confirm_{$user->telegram_id}";
+            $pending    = Cache::get($pendingKey);
+            Cache::forget($pendingKey);
+
+            if ($data === 'selfie:confirm' && $pending) {
+                Cache::put("selfie_confirmed_{$user->telegram_id}", true, now()->addDays(30));
+
+                $lockKey = "selfie_pending_{$user->telegram_id}";
+                if (!Cache::has($lockKey)) {
+                    Cache::put($lockKey, true, now()->addMinutes(5));
+
+                    $waitingMessages = __('messages.selfie_waiting');
+                    $this->sendMessage($bot, $chatId, $waitingMessages[array_rand($waitingMessages)]);
+                    $this->sendChatAction($bot, $chatId, 'upload_photo');
+
+                    GenerateSelfieJob::dispatch($bot, $user, $chatId, $pending['text'], $pending['image_prompt'], $pending['negative_prompt']);
+                }
+                return;
+            }
+
+            if ($data === 'selfie:decline' && $pending) {
+                if ($user->canChat()) {
+                    $user->messages()->create([
+                        'role'    => 'user',
+                        'content' => $pending['text'],
+                        'bot_id'  => $bot->id,
+                    ]);
+                    $this->sendChatAction($bot, $chatId, 'typing');
+                    $reply = $this->getAiResponse($user, $bot);
+                    $user->messages()->create([
+                        'role'    => 'assistant',
+                        'content' => $reply,
+                        'bot_id'  => $bot->id,
+                    ]);
+                    $user->consumeCredit();
+                    $this->sendMessage($bot, $chatId, $reply);
+                } else {
+                    $this->sendPackageOptions($bot, $chatId, __('messages.chat_no_credits'));
+                }
+            }
+
+            return;
+        }
+
+        // Payment callbacks
         Http::post(config('services.telegram.endpoint') . "{$bot->telegram_token}/answerCallbackQuery", [
             'callback_query_id' => $callbackId,
             'text'              => __('messages.payment_creating'),
