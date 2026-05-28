@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(php artisan *)",
-      "WebFetch(domain:docs.transfi.com)"
+      "WebFetch(domain:docs.transfi.com)",
+      "Bash(curl -s -w \"\\\\n%{http_code}\" https://sandbox-api.transfi.com/v3/openapi)",
+      "Bash(curl -s -w \"\\\\n%{http_code}\" https://docs.transfi.com/openapi/users.yaml)",
+      "Bash(curl -s -H \"Accept: application/yaml, text/yaml\" https://docs.transfi.com/openapi.yaml)",
+      "Bash(curl -s -L \"https://docs.transfi.com/api-reference/users/create-individual-user\")",
+      "Bash(curl -s \"https://docs.transfi.com/reference/create-individual-user.md\")"
     ]
   }
 }

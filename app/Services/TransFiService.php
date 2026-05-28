@@ -45,11 +45,10 @@ class TransFiService
                 'country'            => 'ID',
                 'countryOfResidence' => 'ID',
                 'address'            => [
-                    'street'     => 'Jl. Jenderal Sudirman No. 1',
-                    'city'       => 'Jakarta Pusat',
-                    'state'      => 'DKI Jakarta',
-                    'postalCode' => '10220',
-                    'country'    => 'ID',
+                    'street'     => '123 Main Street',
+                    'city'       => 'New York',
+                    'state'      => 'NY',
+                    'postalCode' => '10001',
                 ],
             ]);
 
