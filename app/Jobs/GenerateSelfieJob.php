@@ -38,7 +38,7 @@ class GenerateSelfieJob implements ShouldQueue
 
             if ($imageUrl) {
                 $this->user->messages()->create(['role' => 'user',      'content' => $this->userText,   'bot_id' => $this->bot->id]);
-                $this->user->messages()->create(['role' => 'assistant', 'content' => '[selfie photo]',  'bot_id' => $this->bot->id]);
+                $this->user->messages()->create(['role' => 'assistant', 'content' => '*mengirimkan foto selfie ke kamu* 📸', 'bot_id' => $this->bot->id]);
                 $this->user->consumeCredit(5);
 
                 Http::post("{$endpoint}{$token}/sendPhoto", [
