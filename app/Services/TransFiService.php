@@ -38,7 +38,8 @@ class TransFiService
         // Confirmed: TransFi uses Basic auth (username:password from Settings → Integration tab)
         $body = [
             'orderType'          => 'payin',
-            'purposeCode'        => 'software',
+            'purposeCode'        => 'software_export_or_development',
+            'userId'             => config('services.transfi.mid'),
             'partnerId'          => (string) $payment->id,
             'source'             => [
                 'currency' => config('services.transfi.source_currency', 'USDT'),
