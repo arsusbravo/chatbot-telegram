@@ -44,6 +44,13 @@ class TransFiService
                 'phoneCode'          => '+62',
                 'country'            => 'ID',
                 'countryOfResidence' => 'ID',
+                'address'            => [
+                    'addressLine1' => 'Jl. Jenderal Sudirman No. 1',
+                    'city'         => 'Jakarta Pusat',
+                    'state'        => 'DKI Jakarta',
+                    'postCode'     => '10220',
+                    'country'      => 'ID',
+                ],
             ]);
 
         Log::info('TransFi createUser response', $response->json() ?? []);
