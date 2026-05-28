@@ -36,21 +36,14 @@ class TransFiService
         $response = Http::withBasicAuth($this->clientId, $this->clientSecret)
             ->withHeaders(['MID' => config('services.transfi.mid')])
             ->post("{$this->endpoint}/v3/users/individual", [
-                'firstName'           => $firstName,
-                'lastName'            => $lastName,
-                'date'                => '01-01-1990',
-                'email'               => $user->email,
-                'phone'               => '0000000000',
-                'phoneCode'           => '+1',
-                'country'             => 'US',
-                'countryOfResidence'  => 'US',
-                'address'             => [
-                    'addressLine1' => '123 Main St',
-                    'city'         => 'New York',
-                    'state'        => 'NY',
-                    'postCode'     => '10001',
-                    'country'      => 'US',
-                ],
+                'firstName'          => $firstName,
+                'lastName'           => $lastName,
+                'date'               => '01-01-1990',
+                'email'              => $user->email,
+                'phone'              => '0000000000',
+                'phoneCode'          => '+62',
+                'country'            => 'ID',
+                'countryOfResidence' => 'ID',
             ]);
 
         Log::info('TransFi createUser response', $response->json() ?? []);
