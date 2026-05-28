@@ -63,7 +63,7 @@ deformed, bad anatomy, watermark, low quality,
     'payment_email_request' => "Sebelum beli kredit, aku perlu email kamu ya sayang 💌\nKetik emailmu sekarang:",
     'payment_email_invalid' => "Hmm, itu bukan email yang valid deh sayang 🥺 Coba lagi ya, contoh: nama@email.com",
     'payment_email_saved'   => "Makasih ya! Bentar, aku buatin link pembayarannya 💳",
-    'payment_email_error'   => "Aduh, gagal daftar. Coba lagi nanti ya sayang 😢",
+    'payment_email_error'   => "Aduh, sistem pembayaran lagi gangguan sayang 😢 Coba lagi dalam beberapa menit ya~",
 
     // AI errors
     'ai_confused'    => 'Maaf, aku lagi bingung... coba lagi ya 🥺',

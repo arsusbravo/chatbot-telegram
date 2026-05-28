@@ -45,11 +45,11 @@ class TransFiService
                 'country'            => 'ID',
                 'countryOfResidence' => 'ID',
                 'address'            => [
-                    'addressLine1' => 'Jl. Jenderal Sudirman No. 1',
-                    'city'         => 'Jakarta Pusat',
-                    'state'        => 'DKI Jakarta',
-                    'postCode'     => '10220',
-                    'country'      => 'ID',
+                    'street'     => 'Jl. Jenderal Sudirman No. 1',
+                    'city'       => 'Jakarta Pusat',
+                    'state'      => 'DKI Jakarta',
+                    'postalCode' => '10220',
+                    'country'    => 'ID',
                 ],
             ]);
 
