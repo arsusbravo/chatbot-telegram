@@ -41,9 +41,9 @@ class TransFiService
                 'date'               => '01-01-1990',
                 'email'              => $user->email,
                 'phone'              => '0000000000',
-                'phoneCode'          => '+62',
-                'country'            => 'ID',
-                'countryOfResidence' => 'ID',
+                'phoneCode'          => '+1',
+                'country'            => 'US',
+                'countryOfResidence' => 'US',
                 'address'            => [
                     'street'     => '123 Main Street',
                     'city'       => 'New York',
