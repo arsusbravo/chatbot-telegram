@@ -37,8 +37,8 @@ class TransFiService
 
         // Confirmed: TransFi uses Basic auth (username:password from Settings → Integration tab)
         $body = [
-            'orderType'          => 'gaming',            // confirmed from TransFi payin docs
-            'purposeCode'        => 'company_expenses',  // TODO: CONFIRM best value for AI chatbot credits
+            'orderType'          => 'payin',
+            'purposeCode'        => 'software',
             'partnerId'          => (string) $payment->id,
             'source'             => [
                 'currency' => config('services.transfi.source_currency', 'USDT'),
@@ -55,14 +55,6 @@ class TransFiService
                 'customerId' => (string) $user->id,
             ],
         ];
-
-        // TransFi requires userId (format: UX-XXXXXXX) for gaming orders.
-        // Set TRANSFI_USER_ID in .env once TransFi provides it.
-        // TODO: CONFIRM with TransFi whether this is a per-user ID or a single merchant ID.
-        $userId = config('services.transfi.user_id');
-        if ($userId) {
-            $body['userId'] = $userId;
-        }
 
         $response = Http::withBasicAuth($this->clientId, $this->clientSecret)
             ->post("{$this->endpoint}/v3/orders", $body);
