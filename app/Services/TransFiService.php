@@ -57,6 +57,7 @@ class TransFiService
         ];
 
         $response = Http::withBasicAuth($this->clientId, $this->clientSecret)
+            ->withHeaders(['MID' => config('services.transfi.mid')])
             ->post("{$this->endpoint}/v3/orders", $body);
 
         if ($response->successful()) {

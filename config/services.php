@@ -55,9 +55,9 @@ return [
         'client_secret'   => env('TRANSFI_CLIENT_SECRET'),
         'webhook_secret'  => env('TRANSFI_WEBHOOK_SECRET'),
         'endpoint'        => env('TRANSFI_ENDPOINT', 'https://api.transfi.com'),
-        'user_id'         => env('TRANSFI_USER_ID'),          // TransFi userId (UX-XXXXXXX), required for gaming orders
-        'source_currency' => env('TRANSFI_SOURCE_CURRENCY', 'USDT'),  // crypto the user pays with
-        'dest_currency'   => env('TRANSFI_DEST_CURRENCY',   'USDT'),  // crypto the merchant receives
+        'mid'             => env('TRANSFI_MID'),
+        'source_currency' => env('TRANSFI_SOURCE_CURRENCY', 'USDT'),
+        'dest_currency'   => env('TRANSFI_DEST_CURRENCY',   'USDT'),
     ],
 
 ];
