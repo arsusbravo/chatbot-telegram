@@ -21,6 +21,65 @@ class TransFiService
     }
 
     /**
+     * Create (or reuse) a TransFi individual user and return the UX- ID.
+     */
+    public function ensureTransFiUser(TelegramUser $user): ?string
+    {
+        if ($user->transfi_user_id) {
+            return $user->transfi_user_id;
+        }
+
+        $nameParts = explode(' ', $user->first_name ?? 'User', 2);
+        $firstName = $nameParts[0];
+        $lastName  = $nameParts[1] ?? 'User';
+
+        $response = Http::withBasicAuth($this->clientId, $this->clientSecret)
+            ->withHeaders(['MID' => config('services.transfi.mid')])
+            ->post("{$this->endpoint}/v3/users/individual", [
+                'firstName'           => $firstName,
+                'lastName'            => $lastName,
+                'date'                => '01-01-1990',
+                'email'               => $user->email,
+                'phone'               => '0000000000',
+                'phoneCode'           => '+1',
+                'country'             => 'US',
+                'countryOfResidence'  => 'US',
+                'address'             => [
+                    'addressLine1' => '123 Main St',
+                    'city'         => 'New York',
+                    'state'        => 'NY',
+                    'postCode'     => '10001',
+                    'country'      => 'US',
+                ],
+            ]);
+
+        Log::info('TransFi createUser response', $response->json() ?? []);
+
+        if (!$response->successful()) {
+            Log::error('TransFi createUser error', $response->json() ?? []);
+            return null;
+        }
+
+        $data = $response->json();
+
+        // Try common field paths for the UX- ID
+        $transfiUserId = $data['data']['userId']
+            ?? $data['data']['id']
+            ?? $data['userId']
+            ?? $data['id']
+            ?? null;
+
+        if (!$transfiUserId) {
+            Log::error('TransFi createUser: could not find userId in response', $data);
+            return null;
+        }
+
+        $user->update(['transfi_user_id' => $transfiUserId]);
+
+        return $transfiUserId;
+    }
+
+    /**
      * Create a hosted payment order and return the checkout URL.
      * Returns ['invoice_url' => string, 'payment_id' => string] or null on failure.
      */
@@ -39,7 +98,7 @@ class TransFiService
         $body = [
             'orderType'          => 'payin',
             'purposeCode'        => 'software_export_or_development',
-            'userId'             => config('services.transfi.mid'),
+            'userId'             => $this->ensureTransFiUser($user),
             'partnerId'          => (string) $payment->id,
             'source'             => [
                 'currency' => config('services.transfi.source_currency', 'USDT'),

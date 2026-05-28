@@ -56,6 +56,7 @@ return [
         'webhook_secret'  => env('TRANSFI_WEBHOOK_SECRET'),
         'endpoint'        => env('TRANSFI_ENDPOINT', 'https://api.transfi.com'),
         'mid'             => env('TRANSFI_MID'),
+        'user_id'         => env('TRANSFI_USER_ID'),
         'source_currency' => env('TRANSFI_SOURCE_CURRENCY', 'USDT'),
         'dest_currency'   => env('TRANSFI_DEST_CURRENCY',   'USDT'),
     ],

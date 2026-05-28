@@ -62,6 +62,40 @@ class TelegramWebhookController extends Controller
             return response()->json(['ok' => true]);
         }
 
+        // Email collection for payment
+        $emailPendingKey = "payment_email_pending_{$user->telegram_id}";
+        if (Cache::has($emailPendingKey)) {
+            if (!filter_var($text, FILTER_VALIDATE_EMAIL)) {
+                $this->sendMessage($bot, $chatId, __('messages.payment_email_invalid'));
+                return response()->json(['ok' => true]);
+            }
+
+            $packageIndex = Cache::pull($emailPendingKey);
+            $packages     = config('payment.packages');
+
+            $user->update(['email' => $text]);
+
+            $this->sendMessage($bot, $chatId, __('messages.payment_email_saved'));
+            $this->sendChatAction($bot, $chatId, 'typing');
+
+            $service = app(\App\Services\TransFiService::class);
+            $invoice = $service->createInvoice($user, $packages[$packageIndex]);
+
+            if ($invoice) {
+                $pkg  = $packages[$packageIndex];
+                $msg  = __('messages.payment_success', [
+                    'name'    => $pkg['name'],
+                    'credits' => $pkg['credits'],
+                    'url'     => $invoice['invoice_url'],
+                ]);
+            } else {
+                $msg = __('messages.payment_email_error');
+            }
+
+            $this->sendMessage($bot, $chatId, $msg);
+            return response()->json(['ok' => true]);
+        }
+
         // Selfie request handling
         if ($this->isSelfieRequest($text) && $bot->avatar_url) {
             if (!$user->canChat(5)) {
@@ -309,6 +343,13 @@ class TelegramWebhookController extends Controller
                 'username'   => $from['username'] ?? null,
             ]
         );
+
+        // If user has no email yet, ask for it and hold the package selection in cache
+        if (!$user->email) {
+            Cache::put("payment_email_pending_{$user->telegram_id}", $packageIndex, now()->addMinutes(15));
+            $this->sendMessage($bot, $chatId, __('messages.payment_email_request'));
+            return;
+        }
 
         $this->sendChatAction($bot, $chatId, 'typing');
 

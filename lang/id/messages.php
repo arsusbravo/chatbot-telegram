@@ -59,6 +59,12 @@ deformed, bad anatomy, watermark, low quality,
 '
     ],
 
+    // Payment email collection
+    'payment_email_request' => "Sebelum beli kredit, aku perlu email kamu ya sayang 💌\nKetik emailmu sekarang:",
+    'payment_email_invalid' => "Hmm, itu bukan email yang valid deh sayang 🥺 Coba lagi ya, contoh: nama@email.com",
+    'payment_email_saved'   => "Makasih ya! Bentar, aku buatin link pembayarannya 💳",
+    'payment_email_error'   => "Aduh, gagal daftar. Coba lagi nanti ya sayang 😢",
+
     // AI errors
     'ai_confused'    => 'Maaf, aku lagi bingung... coba lagi ya 🥺',
     'ai_tired'       => 'Sayang, aku lagi capek banget nih 😴 Coba chat aku lagi nanti ya~',
