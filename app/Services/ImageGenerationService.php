@@ -21,16 +21,18 @@ phone covering chest, arm blocking body,
 gray background, studio lighting, cartoon, anime,
 deformed, bad anatomy, watermark, low quality";
 
-    public function generateSelfie(string $referenceImageUrl, ?string $imagePrompt = null, ?string $negativePrompt = null): ?string
+    public function generateSelfie(string $referenceImageUrl, ?string $imagePrompt = null, ?string $negativePrompt = null, string $type = 'selfie'): ?string
     {
         $model = config('services.fal.model');
 
-        $openingPrompt  = __('messages.selfie_default_prompt.main.opening');
-        $closingPrompt  = __('messages.selfie_default_prompt.main.closing');
-        $negativePrefix = __('messages.selfie_default_prompt.negative');
+        $promptKey = $type === 'nude' ? 'nude_default_prompt' : 'selfie_default_prompt';
+
+        $openingPrompt  = __("messages.{$promptKey}.main.opening");
+        $closingPrompt  = __("messages.{$promptKey}.main.closing");
+        $negativePrefix = __("messages.{$promptKey}.negative");
 
         // If the lang key is missing, Laravel returns the key string itself.
-        $langLoaded = $openingPrompt !== 'messages.selfie_default_prompt.main.opening';
+        $langLoaded = $openingPrompt !== "messages.{$promptKey}.main.opening";
 
         // Build final prompts — fall back to hardcoded defaults if lang file is missing
         $finalPrompt = ($imagePrompt && $langLoaded)
@@ -50,6 +52,7 @@ deformed, bad anatomy, watermark, low quality";
             'num_inference_steps' => 20,
             'true_cfg'            => 1,
             'image_size'          => 'portrait_4_3',
+            "enable_safety_checker" => false,
             'num_images'          => 1,
             'seed'                => random_int(1, 2147483647),
         ];

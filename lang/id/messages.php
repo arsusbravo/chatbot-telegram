@@ -46,6 +46,17 @@ return [
         'lihat selfie', 'lihat foto', 'lihat photo', 'lihat potret',
     ],
 
+    // Nude / explicit keyword detection (checked first, higher priority)
+    'nude_keywords' => [
+        'telanjang', 'bugil', 'polos', 'tanpa baju', 'tanpa busana',
+        'buka baju', 'buka celana', 'buka pakaian', 'lepas baju', 'lepas celana',
+        'foto hot', 'foto seksi', 'foto bugil', 'foto telanjang', 'foto nakal',
+        'kirim hot', 'kirim bugil', 'kirim telanjang', 'kirim seksi',
+        'minta hot', 'minta bugil', 'minta telanjang', 'minta seksi',
+        'pose hot', 'pose seksi', 'pose nakal', 'pose bugil', 'pose telanjang',
+        'setengah telanjang', 'hampir telanjang', 'gak pake baju', 'ga pake baju',
+    ],
+
     'selfie_default_prompt' => [
         'main' => [
             'opening' => 'POV selfie shot, upper body framed from chest to head,
@@ -54,8 +65,22 @@ slight downward angle from above, one arm out of frame,
             'closing' => ' 8k'
         ],
         'negative' => 'camera visible, device in hand,
-gray background, studio lighting, 
+gray background, studio lighting,
 deformed, bad anatomy, watermark, low quality,
+'
+    ],
+
+    'nude_default_prompt' => [
+        'main' => [
+            'opening' => 'nude, fully naked, bare skin, no clothing,
+boudoir photo, soft warm bedroom lighting, lying on bed, natural pose,
+seductive expression, direct eye contact,
+',
+            'closing' => ' photorealistic, 8k, high detail, sharp focus'
+        ],
+        'negative' => 'clothes, dressed, underwear, bra, panties, bikini, covered, clothed,
+gray background, studio lighting,
+deformed, bad anatomy, extra limbs, watermark, low quality,
 '
     ],
 

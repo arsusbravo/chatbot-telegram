@@ -26,6 +26,7 @@ class GenerateSelfieJob implements ShouldQueue
         public readonly string $userText,
         public readonly ?string $imagePrompt = null,
         public readonly ?string $negativePrompt = null,
+        public readonly string $type = 'selfie',
     ) {}
 
     public function handle(ImageGenerationService $service): void
@@ -34,7 +35,7 @@ class GenerateSelfieJob implements ShouldQueue
         $token    = $this->bot->telegram_token;
 
         try {
-            $imageUrl = $service->generateSelfie($this->bot->avatar_url, $this->imagePrompt, $this->negativePrompt);
+            $imageUrl = $service->generateSelfie($this->bot->avatar_url, $this->imagePrompt, $this->negativePrompt, $this->type);
 
             if ($imageUrl) {
                 $this->user->messages()->create(['role' => 'user',      'content' => $this->userText,   'bot_id' => $this->bot->id]);

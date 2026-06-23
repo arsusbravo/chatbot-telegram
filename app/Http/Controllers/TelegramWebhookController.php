@@ -96,8 +96,9 @@ class TelegramWebhookController extends Controller
             return response()->json(['ok' => true]);
         }
 
-        // Selfie request handling
-        if ($this->isSelfieRequest($text) && $bot->avatar_url) {
+        // Selfie / nude request handling
+        $selfieType = $this->getSelfieRequestType($text);
+        if ($selfieType && $bot->avatar_url) {
             if (!$user->canChat(5)) {
                 $this->sendPackageOptions($bot, $chatId, __('messages.selfie_no_credits'));
                 return response()->json(['ok' => true]);
@@ -120,6 +121,7 @@ class TelegramWebhookController extends Controller
                     'text'            => $text,
                     'image_prompt'    => $imagePrompt,
                     'negative_prompt' => $negativePrompt,
+                    'type'            => $selfieType,
                 ], now()->addMinutes(10));
                 $this->sendSelfieConfirmation($bot, $chatId);
                 return response()->json(['ok' => true]);
@@ -128,31 +130,16 @@ class TelegramWebhookController extends Controller
             // Already confirmed → dispatch immediately
             Cache::put($lockKey, true, now()->addMinutes(5));
 
-            $opening        = __('messages.selfie_default_prompt.main.opening');
-            $closing        = __('messages.selfie_default_prompt.main.closing');
-            $negativePrefix = __('messages.selfie_default_prompt.negative');
-            $langLoaded     = $opening !== 'messages.selfie_default_prompt.main.opening';
-
-            $fullPrompt = ($imagePrompt && $langLoaded)
-                ? $opening . $imagePrompt . $closing
-                : ($imagePrompt ?: '(service hardcoded default)');
-
-            $fullNegative = $langLoaded
-                ? $negativePrefix . ($negativePrompt ?? '')
-                : ($negativePrompt ?? '(service hardcoded default)');
-
-            Log::error('Selfie dispatch', [
-                'label'            => $promptRow?->label ?? '(none)',
-                'lang_loaded'      => $langLoaded,
-                'full_prompt'      => $fullPrompt,
-                'full_negative'    => $fullNegative,
+            Log::info('Selfie dispatch', [
+                'type'  => $selfieType,
+                'label' => $promptRow?->label ?? '(none)',
             ]);
 
             $waitingMessages = __('messages.selfie_waiting');
             $this->sendMessage($bot, $chatId, $waitingMessages[array_rand($waitingMessages)]);
             $this->sendChatAction($bot, $chatId, 'upload_photo');
 
-            GenerateSelfieJob::dispatch($bot, $user, $chatId, $text, $imagePrompt, $negativePrompt);
+            GenerateSelfieJob::dispatch($bot, $user, $chatId, $text, $imagePrompt, $negativePrompt, $selfieType);
 
             return response()->json(['ok' => true]);
         }
@@ -185,21 +172,29 @@ class TelegramWebhookController extends Controller
         return response()->json(['ok' => true]);
     }
 
-    private function isSelfieRequest(string $text): bool
+    private function getSelfieRequestType(string $text): ?string
     {
-        $keywords = __('messages.selfie_keywords');
-        if (!is_array($keywords)) {
-            return false;
-        }
         $lower = mb_strtolower($text);
 
-        foreach ($keywords as $keyword) {
-            if (str_contains($lower, $keyword)) {
-                return true;
+        $nudeKeywords = __('messages.nude_keywords');
+        if (is_array($nudeKeywords)) {
+            foreach ($nudeKeywords as $keyword) {
+                if (str_contains($lower, $keyword)) {
+                    return 'nude';
+                }
             }
         }
 
-        return false;
+        $selfieKeywords = __('messages.selfie_keywords');
+        if (is_array($selfieKeywords)) {
+            foreach ($selfieKeywords as $keyword) {
+                if (str_contains($lower, $keyword)) {
+                    return 'selfie';
+                }
+            }
+        }
+
+        return null;
     }
 
     private function sendPackageOptions(Bot $bot, int $chatId, string $prefix = ''): void
@@ -266,31 +261,18 @@ class TelegramWebhookController extends Controller
                 if (!Cache::has($lockKey)) {
                     Cache::put($lockKey, true, now()->addMinutes(5));
 
-                    $opening        = __('messages.selfie_default_prompt.main.opening');
-                    $closing        = __('messages.selfie_default_prompt.main.closing');
-                    $negativePrefix = __('messages.selfie_default_prompt.negative');
-                    $langLoaded     = $opening !== 'messages.selfie_default_prompt.main.opening';
+                    $pendingType = $pending['type'] ?? 'selfie';
 
-                    $fullPrompt = ($pending['image_prompt'] && $langLoaded)
-                        ? $opening . $pending['image_prompt'] . $closing
-                        : ($pending['image_prompt'] ?: '(service hardcoded default)');
-
-                    $fullNegative = $langLoaded
-                        ? $negativePrefix . ($pending['negative_prompt'] ?? '')
-                        : ($pending['negative_prompt'] ?? '(service hardcoded default)');
-
-                    Log::error('Selfie dispatch (from confirm)', [
-                        'lang_loaded'      => $langLoaded,
+                    Log::info('Selfie dispatch (from confirm)', [
+                        'type'             => $pendingType,
                         'image_prompt_raw' => $pending['image_prompt'],
-                        'full_prompt'      => $fullPrompt,
-                        'full_negative'    => $fullNegative,
                     ]);
 
                     $waitingMessages = __('messages.selfie_waiting');
                     $this->sendMessage($bot, $chatId, $waitingMessages[array_rand($waitingMessages)]);
                     $this->sendChatAction($bot, $chatId, 'upload_photo');
 
-                    GenerateSelfieJob::dispatch($bot, $user, $chatId, $pending['text'], $pending['image_prompt'], $pending['negative_prompt']);
+                    GenerateSelfieJob::dispatch($bot, $user, $chatId, $pending['text'], $pending['image_prompt'], $pending['negative_prompt'], $pendingType);
                 }
                 return;
             }
