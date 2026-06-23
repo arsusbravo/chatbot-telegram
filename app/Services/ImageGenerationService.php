@@ -21,14 +21,17 @@ phone covering chest, arm blocking body,
 gray background, studio lighting, cartoon, anime,
 deformed, bad anatomy, watermark, low quality";
 
-    private string $nudeImagePrompt = "nude, naked, bare skin, no clothing,
-boudoir photo, lying on bed, soft warm lighting,
-seductive expression, direct eye contact,
-photorealistic, 8k, high detail";
+    private string $nudeImagePrompt = "(nude:1.4), (naked:1.3), (large breasts:1.3), (big tits:1.2),
+arched back, legs spread, lying on bed seductively, silk sheets, bedroom,
+(seductive expression:1.2), lips parted, heavy lidded eyes, direct eye contact,
+soft warm dim lighting, natural skin texture,
+RAW photo, (photorealistic:1.4), 8k uhd, masterpiece, best quality, ultra detailed, DSLR, sharp focus";
 
-    private string $nudeImageNegativePrompt = "clothes, dressed, underwear, bra, panties, bikini, covered,
-cartoon, anime, deformed, bad anatomy, extra limbs,
-watermark, low quality, blurry";
+    private string $nudeImageNegativePrompt = "(clothes:1.5), (dressed:1.5), (underwear:1.4), (bra:1.4), (panties:1.4), covered, clothed,
+(small breasts:1.3), (flat chest:1.3),
+(deformed:1.4), (bad anatomy:1.5), (poorly drawn:1.3), (extra limbs:1.4),
+(blurry:1.2), watermark, text, cartoon, anime,
+(worst quality:1.4), (low quality:1.4)";
 
     public function generateSelfie(string $referenceImageUrl, ?string $imagePrompt = null, ?string $negativePrompt = null, string $type = 'selfie'): ?string
     {
@@ -112,8 +115,8 @@ watermark, low quality, blurry";
             'negative_prompt'     => $finalNegative,
             'model_type'          => '1_5-v2-plus',
             'num_samples'         => 1,
-            'num_inference_steps' => 50,
-            'guidance_scale'      => 7.5,
+            'num_inference_steps' => 40,
+            'guidance_scale'      => 8.0,
             'width'               => 512,
             'height'              => 768,
             'seed'                => random_int(1, 2147483647),

@@ -72,15 +72,20 @@ deformed, bad anatomy, watermark, low quality,
 
     'nude_default_prompt' => [
         'main' => [
-            'opening' => 'nude, naked, bare skin, no clothing,
-lying on bed, soft warm bedroom lighting, silk sheets,
-seductive expression, direct eye contact,
+            'opening' => '(nude:1.4), (naked:1.3), (large breasts:1.3), (big tits:1.2),
+arched back, legs spread, lying on bed seductively, silk sheets, bedroom,
+(seductive expression:1.2), lips parted, heavy lidded eyes, direct eye contact,
+soft warm dim lighting, golden hour, natural skin texture,
+RAW photo, (photorealistic:1.4), 8k uhd, masterpiece, best quality, ultra detailed,
 ',
-            'closing' => ' photorealistic, 8k, high detail, sharp focus'
+            'closing' => ', DSLR, sharp focus, film grain'
         ],
-        'negative' => 'clothes, dressed, underwear, bra, panties, bikini, covered,
-gray background, studio lighting,
-deformed, bad anatomy, extra limbs, watermark, low quality,
+        'negative' => '(clothes:1.5), (dressed:1.5), (underwear:1.4), (bra:1.4), (panties:1.4), (bikini:1.4), covered, clothed,
+(small breasts:1.3), (flat chest:1.3),
+(deformed:1.4), (bad anatomy:1.5), (poorly drawn:1.3), (extra limbs:1.4), (missing limbs:1.3),
+(blurry:1.2), watermark, text, logo, signature,
+cartoon, anime, painting, sketch, illustration,
+(worst quality:1.4), (low quality:1.4),
 '
     ],
 
