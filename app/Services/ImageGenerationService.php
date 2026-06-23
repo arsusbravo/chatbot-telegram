@@ -131,8 +131,15 @@ watermark, low quality, blurry";
         ])->timeout(180)->post('https://fal.run/fal-ai/ip-adapter-face-id', $payload);
 
         if ($response->successful()) {
-            $imageUrl = $response->json('images.0.url');
-            Log::info('fal.ai ip-adapter-face-id response OK', ['image_url' => $imageUrl]);
+            $body = $response->json();
+            Log::info('fal.ai ip-adapter-face-id response', ['body' => $body]);
+
+            $imageUrl = $body['images'][0]['url']
+                ?? $body['images'][0]
+                ?? $body['image']['url']
+                ?? $body['image']
+                ?? null;
+
             return $imageUrl;
         }
 
