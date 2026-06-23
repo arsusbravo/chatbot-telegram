@@ -72,13 +72,13 @@ deformed, bad anatomy, watermark, low quality,
 
     'nude_default_prompt' => [
         'main' => [
-            'opening' => 'nude, fully naked, bare skin, no clothing,
-boudoir photo, soft warm bedroom lighting, lying on bed, natural pose,
+            'opening' => 'nude, naked, bare skin, no clothing,
+lying on bed, soft warm bedroom lighting, silk sheets,
 seductive expression, direct eye contact,
 ',
             'closing' => ' photorealistic, 8k, high detail, sharp focus'
         ],
-        'negative' => 'clothes, dressed, underwear, bra, panties, bikini, covered, clothed,
+        'negative' => 'clothes, dressed, underwear, bra, panties, bikini, covered,
 gray background, studio lighting,
 deformed, bad anatomy, extra limbs, watermark, low quality,
 '

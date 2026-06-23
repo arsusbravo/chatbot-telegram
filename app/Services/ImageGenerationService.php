@@ -21,20 +21,28 @@ phone covering chest, arm blocking body,
 gray background, studio lighting, cartoon, anime,
 deformed, bad anatomy, watermark, low quality";
 
+    private string $nudeImagePrompt = "nude, naked, bare skin, no clothing,
+boudoir photo, lying on bed, soft warm lighting,
+seductive expression, direct eye contact,
+photorealistic, 8k, high detail";
+
+    private string $nudeImageNegativePrompt = "clothes, dressed, underwear, bra, panties, bikini, covered,
+cartoon, anime, deformed, bad anatomy, extra limbs,
+watermark, low quality, blurry";
+
     public function generateSelfie(string $referenceImageUrl, ?string $imagePrompt = null, ?string $negativePrompt = null, string $type = 'selfie'): ?string
     {
+        if ($type === 'nude') {
+            return $this->generateNude($referenceImageUrl, $imagePrompt, $negativePrompt);
+        }
+
         $model = config('services.fal.model');
 
-        $promptKey = $type === 'nude' ? 'nude_default_prompt' : 'selfie_default_prompt';
+        $openingPrompt  = __('messages.selfie_default_prompt.main.opening');
+        $closingPrompt  = __('messages.selfie_default_prompt.main.closing');
+        $negativePrefix = __('messages.selfie_default_prompt.negative');
+        $langLoaded     = $openingPrompt !== 'messages.selfie_default_prompt.main.opening';
 
-        $openingPrompt  = __("messages.{$promptKey}.main.opening");
-        $closingPrompt  = __("messages.{$promptKey}.main.closing");
-        $negativePrefix = __("messages.{$promptKey}.negative");
-
-        // If the lang key is missing, Laravel returns the key string itself.
-        $langLoaded = $openingPrompt !== "messages.{$promptKey}.main.opening";
-
-        // Build final prompts — fall back to hardcoded defaults if lang file is missing
         $finalPrompt = ($imagePrompt && $langLoaded)
             ? $openingPrompt . $imagePrompt . $closingPrompt
             : ($imagePrompt ?: $this->imagePrompt);
@@ -44,22 +52,21 @@ deformed, bad anatomy, watermark, low quality";
             : ($negativePrompt ?? $this->imageNegativePrompt);
 
         $payload = [
-            'prompt'              => $finalPrompt,
-            'negative_prompt'     => $finalNegativePrompt,
-            'reference_image_url' => $referenceImageUrl,
-            'id_weight'           => 0.6,
-            'guidance_scale'      => 5.5,
-            'num_inference_steps' => 20,
-            'true_cfg'            => 1,
-            'image_size'          => 'portrait_4_3',
-            "enable_safety_checker" => false,
-            'num_images'          => 1,
-            'seed'                => random_int(1, 2147483647),
+            'prompt'                => $finalPrompt,
+            'negative_prompt'       => $finalNegativePrompt,
+            'reference_image_url'   => $referenceImageUrl,
+            'id_weight'             => 0.6,
+            'guidance_scale'        => 5.5,
+            'num_inference_steps'   => 20,
+            'true_cfg'              => 1,
+            'image_size'            => 'portrait_4_3',
+            'enable_safety_checker' => false,
+            'num_images'            => 1,
+            'seed'                  => random_int(1, 2147483647),
         ];
 
-        Log::info('fal.ai request', [
+        Log::info('fal.ai flux-pulid request', [
             'model'           => $model,
-            'lang_loaded'     => $langLoaded,
             'prompt'          => $finalPrompt,
             'negative_prompt' => $finalNegativePrompt,
             'reference_url'   => $referenceImageUrl,
@@ -72,11 +79,64 @@ deformed, bad anatomy, watermark, low quality";
 
         if ($response->successful()) {
             $imageUrl = $response->json('images.0.url');
-            Log::info('fal.ai response OK', ['image_url' => $imageUrl]);
+            Log::info('fal.ai flux-pulid response OK', ['image_url' => $imageUrl]);
             return $imageUrl;
         }
 
-        Log::error('fal.ai PuLID error', [
+        Log::error('fal.ai flux-pulid error', [
+            'status' => $response->status(),
+            'body'   => $response->json() ?? $response->body(),
+        ]);
+
+        return null;
+    }
+
+    private function generateNude(string $referenceImageUrl, ?string $imagePrompt = null, ?string $negativePrompt = null): ?string
+    {
+        $openingPrompt  = __('messages.nude_default_prompt.main.opening');
+        $closingPrompt  = __('messages.nude_default_prompt.main.closing');
+        $negativePrefix = __('messages.nude_default_prompt.negative');
+        $langLoaded     = $openingPrompt !== 'messages.nude_default_prompt.main.opening';
+
+        $finalPrompt = ($imagePrompt && $langLoaded)
+            ? $openingPrompt . $imagePrompt . $closingPrompt
+            : ($imagePrompt ?: $this->nudeImagePrompt);
+
+        $finalNegative = $langLoaded
+            ? $negativePrefix . ($negativePrompt ?? '')
+            : ($negativePrompt ?? $this->nudeImageNegativePrompt);
+
+        $payload = [
+            'face_image_url'      => $referenceImageUrl,
+            'prompt'              => $finalPrompt,
+            'negative_prompt'     => $finalNegative,
+            'model_type'          => '1_5-v2-plus',
+            'num_samples'         => 1,
+            'num_inference_steps' => 50,
+            'guidance_scale'      => 7.5,
+            'width'               => 512,
+            'height'              => 768,
+            'seed'                => random_int(1, 2147483647),
+        ];
+
+        Log::info('fal.ai ip-adapter-face-id request', [
+            'prompt'          => $finalPrompt,
+            'negative_prompt' => $finalNegative,
+            'reference_url'   => $referenceImageUrl,
+            'seed'            => $payload['seed'],
+        ]);
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Key ' . config('services.fal.key'),
+        ])->timeout(180)->post('https://fal.run/fal-ai/ip-adapter-face-id', $payload);
+
+        if ($response->successful()) {
+            $imageUrl = $response->json('images.0.url');
+            Log::info('fal.ai ip-adapter-face-id response OK', ['image_url' => $imageUrl]);
+            return $imageUrl;
+        }
+
+        Log::error('fal.ai ip-adapter-face-id error', [
             'status' => $response->status(),
             'body'   => $response->json() ?? $response->body(),
         ]);
