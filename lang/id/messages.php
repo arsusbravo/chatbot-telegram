@@ -73,12 +73,9 @@ deformed, bad anatomy, watermark, low quality,
     'nude_default_prompt' => [
         'main' => [
             'opening' => '(nude:1.4), (naked:1.3), (large breasts:1.3), (big tits:1.2),
-half body shot, lying on bed, silk sheets, facing camera,
-slight arch in back, legs together, knees bent,
 (pleasure face:1.4), (ahegao:1.2), mouth open, tongue out, (flushed cheeks:1.2),
 (eyes rolling back:1.2), (moaning expression:1.3), heavy breathing, (ecstasy:1.2),
-soft warm dim bedroom lighting, natural skin texture,
-(perfect anatomy:1.3), (perfect body proportions:1.3), anatomically correct,
+natural skin texture, (perfect anatomy:1.3), (perfect body proportions:1.3), anatomically correct,
 RAW photo, (photorealistic:1.4), 8k uhd, masterpiece, best quality, ultra detailed,
 ',
             'closing' => ', DSLR, sharp focus, 85mm lens, film grain'
