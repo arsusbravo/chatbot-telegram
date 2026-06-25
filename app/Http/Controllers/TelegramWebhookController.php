@@ -111,7 +111,7 @@ class TelegramWebhookController extends Controller
                 return response()->json(['ok' => true]);
             }
 
-            $promptRow      = ImagePrompt::inRandomOrder()->first();
+            $promptRow      = ImagePrompt::where('type', $selfieType)->inRandomOrder()->first();
             $imagePrompt    = $promptRow?->prompt;
             $negativePrompt = $promptRow?->negative_prompt;
 
@@ -400,14 +400,6 @@ class TelegramWebhookController extends Controller
         Http::post(config('services.telegram.endpoint') . "{$bot->telegram_token}/sendMessage", [
             'chat_id' => $chatId,
             'text'    => $text,
-        ]);
-    }
-
-    private function sendPhoto(Bot $bot, int $chatId, string $photoUrl): void
-    {
-        Http::post(config('services.telegram.endpoint') . "{$bot->telegram_token}/sendPhoto", [
-            'chat_id' => $chatId,
-            'photo'   => $photoUrl,
         ]);
     }
 

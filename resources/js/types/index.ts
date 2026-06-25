@@ -41,6 +41,7 @@ export interface Message {
 export interface ImagePrompt {
     id: number;
     label: string;
+    type: 'selfie' | 'nude';
     prompt: string;
     negative_prompt: string | null;
     created_at: string;

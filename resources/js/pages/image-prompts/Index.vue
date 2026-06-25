@@ -38,7 +38,7 @@ function deletePrompt(prompt: ImagePrompt) {
         </div>
 
         <p class="text-sm text-gray-500 dark:text-gray-400 -mt-2">
-            One prompt is selected at random for every selfie generated, across all bots.
+            One prompt is selected at random per type for every image generated, across all bots.
         </p>
 
         <div class="grid gap-4">
@@ -49,7 +49,15 @@ function deletePrompt(prompt: ImagePrompt) {
             >
                 <div class="flex items-start justify-between gap-4">
                     <div class="min-w-0 flex-1">
-                        <h2 class="text-base font-semibold text-gray-900 dark:text-white">{{ prompt.label }}</h2>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-base font-semibold text-gray-900 dark:text-white">{{ prompt.label }}</h2>
+                            <span
+                                :class="prompt.type === 'nude'
+                                    ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400'
+                                    : 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400'"
+                                class="text-xs font-medium px-2 py-0.5 rounded-full"
+                            >{{ prompt.type }}</span>
+                        </div>
                         <p class="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-2 font-mono">{{ prompt.prompt }}</p>
                         <p v-if="prompt.negative_prompt" class="text-sm text-red-500 dark:text-red-400 mt-1 line-clamp-1 font-mono">
                             <span class="font-sans text-xs font-medium text-gray-400 mr-1">neg:</span>{{ prompt.negative_prompt }}

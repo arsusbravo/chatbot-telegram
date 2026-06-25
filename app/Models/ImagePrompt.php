@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class ImagePrompt extends Model
 {
-    protected $fillable = ['label', 'prompt', 'negative_prompt'];
+    protected $fillable = ['label', 'type', 'prompt', 'negative_prompt'];
 }

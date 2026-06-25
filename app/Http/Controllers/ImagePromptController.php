@@ -26,6 +26,7 @@ class ImagePromptController extends Controller
     {
         $validated = $request->validate([
             'label'           => 'required|string|max:100',
+            'type'            => 'required|in:selfie,nude',
             'prompt'          => 'required|string',
             'negative_prompt' => 'nullable|string',
         ]);
@@ -47,6 +48,7 @@ class ImagePromptController extends Controller
     {
         $validated = $request->validate([
             'label'           => 'required|string|max:100',
+            'type'            => 'required|in:selfie,nude',
             'prompt'          => 'required|string',
             'negative_prompt' => 'nullable|string',
         ]);
@@ -59,9 +61,16 @@ class ImagePromptController extends Controller
     private function promptContext(): array
     {
         return [
-            'opening_prompt'   => __('messages.selfie_default_prompt.main.opening'),
-            'closing_prompt'   => __('messages.selfie_default_prompt.main.closing'),
-            'negative_prefix'  => __('messages.selfie_default_prompt.negative'),
+            'selfie_context' => [
+                'opening' => __('messages.selfie_default_prompt.main.opening'),
+                'closing' => __('messages.selfie_default_prompt.main.closing'),
+                'negative_prefix' => __('messages.selfie_default_prompt.negative'),
+            ],
+            'nude_context' => [
+                'opening' => __('messages.nude_default_prompt.main.opening'),
+                'closing' => __('messages.nude_default_prompt.main.closing'),
+                'negative_prefix' => __('messages.nude_default_prompt.negative'),
+            ],
         ];
     }
 

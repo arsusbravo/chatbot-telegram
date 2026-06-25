@@ -1,29 +1,32 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import { index, update } from '@/routes/image-prompts';
 import type { ImagePrompt } from '@/types';
 
 const props = defineProps<{
     prompt: ImagePrompt;
-    opening_prompt: string;
-    closing_prompt: string;
-    negative_prefix: string;
+    selfie_context: { opening: string; closing: string; negative_prefix: string };
+    nude_context:   { opening: string; closing: string; negative_prefix: string };
 }>();
 
 defineOptions({
     layout: {
         breadcrumbs: [
-            { title: 'Selfie Prompts', href: index.url() },
+            { title: 'Image Prompts', href: index.url() },
             { title: 'Edit Prompt', href: '#' },
         ],
     },
 });
 
 const form = useForm({
-    label: props.prompt.label,
-    prompt: props.prompt.prompt,
+    label:           props.prompt.label,
+    type:            props.prompt.type,
+    prompt:          props.prompt.prompt,
     negative_prompt: props.prompt.negative_prompt ?? '',
 });
+
+const context = computed(() => form.type === 'nude' ? props.nude_context : props.selfie_context);
 
 function submit() {
     form.put(update.url(props.prompt.id));
@@ -35,6 +38,7 @@ function submit() {
 
     <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4 max-w-2xl">
         <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border p-6 space-y-5">
+
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Label</label>
                 <input
@@ -46,20 +50,32 @@ function submit() {
             </div>
 
             <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
+                <select
+                    v-model="form.type"
+                    class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                >
+                    <option value="selfie">Selfie</option>
+                    <option value="nude">Nude</option>
+                </select>
+                <p v-if="form.errors.type" class="text-red-500 text-sm mt-1">{{ form.errors.type }}</p>
+            </div>
+
+            <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prompt</label>
-                <pre class="w-full rounded-lg rounded-b-none border border-b-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 text-xs font-mono px-3 py-2 whitespace-pre-wrap">{{ props.opening_prompt }}</pre>
+                <pre class="w-full rounded-lg rounded-b-none border border-b-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 text-xs font-mono px-3 py-2 whitespace-pre-wrap">{{ context.opening }}</pre>
                 <textarea
                     v-model="form.prompt"
                     rows="6"
                     class="w-full rounded-none border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-white shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm font-mono"
                 />
-                <pre class="w-full rounded-lg rounded-t-none border border-t-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 text-xs font-mono px-3 py-2 whitespace-pre-wrap">{{ props.closing_prompt }}</pre>
+                <pre class="w-full rounded-lg rounded-t-none border border-t-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 text-xs font-mono px-3 py-2 whitespace-pre-wrap">{{ context.closing }}</pre>
                 <p v-if="form.errors.prompt" class="text-red-500 text-sm mt-1">{{ form.errors.prompt }}</p>
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Negative Prompt <span class="font-normal text-gray-400">(optional)</span></label>
-                <pre class="w-full rounded-lg rounded-b-none border border-b-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 text-xs font-mono px-3 py-2 whitespace-pre-wrap">{{ props.negative_prefix }}</pre>
+                <pre class="w-full rounded-lg rounded-b-none border border-b-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 text-xs font-mono px-3 py-2 whitespace-pre-wrap">{{ context.negative_prefix }}</pre>
                 <textarea
                     v-model="form.negative_prompt"
                     rows="3"
