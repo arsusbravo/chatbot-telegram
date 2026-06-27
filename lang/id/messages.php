@@ -72,7 +72,7 @@ deformed, bad anatomy, watermark, low quality,
 
     'nude_default_prompt' => [
         'main' => [
-            'opening' => '(nude:1.4), (naked:1.3), (large breasts:1.3), (big tits:1.2),
+            'opening' => '(nude:1.4), (naked:1.3), (huge breasts:1.5), (large breasts:1.4), (big tits:1.4), (voluptuous:1.3), (busty:1.3),
 (pleasure face:1.4), (ahegao:1.2), mouth open, tongue out, (flushed cheeks:1.2),
 (eyes rolling back:1.2), (moaning expression:1.3), heavy breathing, (ecstasy:1.2),
 natural skin texture, (perfect anatomy:1.3), (perfect body proportions:1.3), anatomically correct,
@@ -81,7 +81,7 @@ RAW photo, (photorealistic:1.4), 8k uhd, masterpiece, best quality, ultra detail
             'closing' => ', DSLR, sharp focus, 85mm lens, film grain'
         ],
         'negative' => '(clothes:1.5), (dressed:1.5), (underwear:1.4), (bra:1.4), (panties:1.4), (bikini:1.4), covered, clothed,
-(small breasts:1.3), (flat chest:1.3),
+(small breasts:1.5), (flat chest:1.5), (tiny tits:1.5),
 (deformed:1.5), (bad anatomy:1.5), (poorly drawn:1.4),
 (extra limbs:1.5), (missing limbs:1.4), (extra legs:1.5), (extra arms:1.5),
 (mutated hands:1.4), (fused fingers:1.4), (too many fingers:1.4), (malformed limbs:1.5),
